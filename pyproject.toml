@@ -1,0 +1,8 @@
+[project]
+name="lehaneos"
+version="0.1.0"
+description="Infrastructure and automation platform"
+auhtors=[
+    { name="Yohan Grondin" }
+]
+requires-python=">=3.14.4"
