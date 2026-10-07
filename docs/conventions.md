@@ -159,6 +159,86 @@ DC01.lehaneos.lan
 LEHANEOS
 ```
 
+## Compte utilisateur
+
+jdoe
+
+Exemple:
+```text
+Philippe Martin = pmartin
+Jean Dupont = jdupont
+```
+
+
+## Comptes administrateur
+
+[login]-adm
+
+Exemple :
+
+```text
+pmartin-adm
+jdupont-adm
+```
+
+## Comptes de services
+
+svc-[application]-[role]
+
+Exemple :
+
+```text
+svc-lehaneos-ldap
+svc-lehaneos-ps
+svc-backup
+```
+
+## Groupes de départements
+
+GRP_DEPT_[SERVICE]
+
+Exemple :
+```text
+GRP_DEPT_IT
+GRP_DEPT_ACHAT
+GRP_DEPT_COMPTA
+```
+
+## Groupes de partage
+
+GRP_SHARE_[SERVICE/NOM_DU_REPERTOIRE]_[DROIT]
+
+Exemple :
+```text
+GRP_SHARE_IT_RW
+GRP_SHARE_IT_RO
+
+GRP_SHARE_RH_IT_RO
+GRP_SHARE_RH_IT_RW
+```
+
+## Groupes de Sécurité
+
+GRP_ADM_[ROLE]
+
+```text
+GRP_ADM_AD
+GRP_ADM_SERVER
+GRP_DEV_SERVER
+```
+
+## OU
+```text
+Users
+Admins
+Service Accounts
+Servers
+Workstations
+```
+Pas besoin de prefixe.
+
+Les OU doivent rester lisibles.
+
 ---
 
 # Philosophie
