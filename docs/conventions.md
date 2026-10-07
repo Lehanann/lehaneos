@@ -102,9 +102,39 @@ Exemples :
 
 # Git
 
-## Branche principale
+## Convention de nommage des branches
 
-main
+```main```
+    Branche de production.
+
+```develop```
+    Branche d'intégration.
+
+```feature/<domaine>/<fonctionnalité>```
+    Développement d'une fonctionnalité.
+
+```fix/<domaine>/<correction>```
+    Correction de bug.
+
+```docs/<sujet>```
+    Documentation.
+
+```refactor/<sujet>```
+
+Exemples :
+```text
+feature/ad/ldap-client
+feature/ad/powershell-runner
+
+feature/iam/create-user
+feature/iam/search-user
+
+feature/rh/onboarding
+
+docs/active-directory
+
+fix/ad
+```
 
 ## Commits
 
@@ -117,6 +147,7 @@ Exemples :
 - feat: add LDAP user search
 - fix: handle duplicate usernames
 - docs: update active directory documentation
+
 
 ---
 
