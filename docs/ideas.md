@@ -68,6 +68,7 @@ La présence d'une idée dans ce document ne constitue pas un engagement de dév
 - Gestion du cycle de vie des identités
 - Workflow d'approbation des accès
 - Gestion des accès Just-In-Time
+- Provisionnement dédié des comptes administratifs
 
 ---
 
