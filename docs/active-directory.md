@@ -262,6 +262,66 @@ Exécution des opérations d'écriture Active Directory.
 - modification utilisateur
 - désactivation utilisateur
 
+
+### Groupes techniques LehanEOS
+
+#### GRP_ADM_LEHANEOS
+
+**Fonction**
+
+Groupe d'administration logique de la plateforme LehanEOS.
+
+**Membres**
+
+```text
+svc-lehaneos-ldap
+svc-lehaneos-ps
+```
+
+
+**Utilisation**
+
+- Identification des comptes liés à LehanEOS
+- Regroupement des comptes techniques
+- Audit et traçabilité
+- Base des futures délégations
+
+#### GRP_LEHANEOS_LDAP
+
+**Fonction**
+
+Groupe dédié à la lecture de l'annuaire Active Directory.
+
+Membres
+```text
+svc-lehaneos-ldap
+```
+**Utilisation**
+
+- Recherche utilisateur
+- Recherche groupe
+- Vérification d'unicité
+- Consultation LDAP
+
+#### GRP_LEHANEOS_PROVISIONING
+
+**Fonction**
+
+Groupe dédié aux opérations de provisioning Active Directory.
+
+Membres
+```text
+svc-lehaneos-ps
+```
+
+**Utilisation**
+
+- Création d'utilisateurs
+- Modification d'utilisateurs
+- Désactivation d'utilisateurs
+- Création de groupes
+- Gestion des appartenances aux groupes
+
 ---
 
 ## Modèle de sécurité
@@ -276,6 +336,99 @@ Exécution des opérations d'écriture Active Directory.
 ### Source de vérité
 
 Active Directory constitue la source de vérité de la V0.1.
+
+---
+
+## Modèle de délégation
+
+### Principe
+
+Les permissions ne sont jamais attribuées directement aux comptes.
+
+Le modèle retenu est : 
+
+```text 
+Utilisateur 
+    ↓ 
+  Groupe 
+    ↓ 
+Permissions
+```
+
+Cette approche facilite :
+
+- la maintenance
+- l'audit
+- l'ajout de nouveaux comptes
+- le respect du principe du moindre privilège
+
+### GRP_LEHANEOS_LDAP
+
+**Périmètre**
+
+```text
+OU=LehanEOS_France
+```
+**Autorisations cibles**
+
+- Lecture des utilisateurs
+- Lecture des groupes
+- Lecture des unités organisationnelles
+
+**Restrictions**
+
+- Aucune opération d'écriture
+- Aucune création d'objet
+- Aucune suppression d'objet
+- Aucune modification d'objet
+
+#### GRP_LEHANEOS_PROVISIONING
+
+**Périmètre**
+
+```text
+OU=Users
+OU=Groups
+```
+
+**Autorisations cibles**
+
+- Création d'utilisateurs
+- Modification d'utilisateurs
+- Désactivation d'utilisateurs
+- Création de groupes
+- Modification de groupes
+- Gestion des appartenances aux groupes
+
+**Restrictions**
+
+- Aucune création d'OU
+- Aucune suppression d'OU
+- Aucune délégation de droits
+- Aucune administration du domaine
+
+#### Administrator
+
+**Périmètre**
+
+```text
+Domaine complet
+```
+**Responsabilités**
+
+- Administration complète du domaine
+- Gestion AD DS
+- Gestion DNS
+- Gestion des délégations
+- Restauration et reprise après incident
+
+#### ygrondin-adm
+
+**Périmètre**
+
+Compte d'administration personnel.
+Ce compte n'entre pas dans le périmètre fonctionnel de LehanEOS.
+Les privilèges associés à ce compte sont définis indépendamment du projet.
 
 ---
 
