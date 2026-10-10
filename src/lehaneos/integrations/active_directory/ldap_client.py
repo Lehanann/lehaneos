@@ -1,0 +1,5 @@
+
+
+class ActiveDirectoryClient:
+    pass
+
