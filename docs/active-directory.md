@@ -79,7 +79,6 @@ DC=lehaneos,DC=lan
     ├── OU=Service Accounts
     ├── OU=Servers
     ├── OU=Workstations
-
     └── OU=Groups
 
         ├── OU=Departments
