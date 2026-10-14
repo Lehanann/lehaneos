@@ -9,3 +9,8 @@ class ActiveDirectoryConnectionError(ActiveDirectoryError):
 class ActiveDirectorySearchError(ActiveDirectoryError):
     pass
 
+class ActiveDirectoryUserNotFoundError(ActiveDirectoryError):
+    pass
+
+class ActiveDirectoryGroupNotFoundError(ActiveDirectoryError):
+    pass

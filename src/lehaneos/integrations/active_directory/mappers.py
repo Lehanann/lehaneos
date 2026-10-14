@@ -7,6 +7,15 @@ class ADUserMapper:
 
     @staticmethod
     def entry_to_user(entry: Entry) -> ADUser:
+        """
+        Convert an LDAP entry into an ADUser object.
+
+        Args:
+            entry: LDAP user entry returned by ldap3.
+
+        Returns:
+            A populated ADUser instance.
+        """
         data = entry.entry_attributes_as_dict
         return ADUser(
             username=data['sAMAccountName'][0],
@@ -35,6 +44,15 @@ class ADGroupMapper:
 
     @staticmethod
     def entry_to_group(entry: Entry) -> ADGroup:
+        """
+        Convert an LDAP entry into an ADGroup object.
+
+        Args:
+            entry: LDAP group entry returned by ldap3.
+
+        Returns:
+            A populated ADGroup instance.
+        """
         data = entry.entry_attributes_as_dict
         return ADGroup(
             name=data.get('name', [None])[0],

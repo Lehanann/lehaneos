@@ -2,6 +2,9 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 
 class ADGroup(BaseModel):
+    """
+    Represents an Active Directory group.
+    """
     name: str = Field(..., description="Active directory group name")
     distinguished_name: str = Field(..., description="Group distinguished name")
     members_dn: list['str'] = Field(default_factory=list, description="Group member list")

@@ -2,6 +2,9 @@ from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
 
 class ADUser(BaseModel):
+    """
+    Represents an Active Directory user.
+    """
     username: str = Field(..., description="Active directory username")
     email: EmailStr | None = Field(None, description="User email address")
     first_name: str | None = Field(None, description="User first name")

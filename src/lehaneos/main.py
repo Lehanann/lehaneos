@@ -16,5 +16,7 @@ print("###")
 print("USER GROUP", ad.get_user_groups("jdupont") )
 print("###")
 print("MEMBERS OF GRP_LEHANEOS_LDAP \n",ad.get_group_members("GRP_LEHANEOS_LDAP"))
+print("###")
+print(ad.is_member_of("jdupont","GRP_ADM_LEHANEOS"))
 
 ad.disconnect()
