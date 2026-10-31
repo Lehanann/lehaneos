@@ -12,15 +12,19 @@ class Settings(BaseSettings):
     ad_username: str = Field(default="")
     ad_password: SecretStr = Field(default=SecretStr(""))
     ad_base_dn: str = Field(default="DC=DOMAIN,DC=LOCAL")
+    ad_root_ou: str = Field(default="")
     ad_users_ou: str = Field(default="OU=Users")
     ad_groups_ou: str = Field (default="OU=Groups")
     ad_port: int = Field(default=389)
 
     @property
-    def users_dn(self):
-        return f"{self.ad_users_ou},{self.ad_base_dn}"
+    def users_dn(self) -> str:
+        return f"{self.ad_users_ou},{self.ad_root_ou},{self.ad_base_dn}"
     @property
-    def groups_dn(self):
-        return f"{self.ad_groups_ou},{self.ad_base_dn}"
+    def groups_dn(self) -> str:
+        return f"{self.ad_groups_ou},{self.ad_root_ou},{self.ad_base_dn}"
+    @property
+    def full_root_ou(self) -> str:
+        return f"{self.ad_root_ou},{self.ad_base_dn}"
 
 settings = Settings()
