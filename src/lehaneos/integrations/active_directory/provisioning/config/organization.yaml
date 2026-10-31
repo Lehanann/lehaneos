@@ -1,0 +1,20 @@
+company:
+  name: LehanEOS
+  street: 1 rue de la république
+  city: Lyon
+  country: FR
+  domain: lehaneos.lan
+  email_domain: lehaneos.lan
+
+organization_units:
+  users:
+    display_name: Users
+    ou_name: Users
+
+  admins:
+    display_name: Admins
+    ou_name: Admins
+
+  service_accounts:
+    display_name: Service Accounts
+    ou_name: Service_accounts
