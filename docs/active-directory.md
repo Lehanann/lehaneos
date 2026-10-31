@@ -80,7 +80,6 @@ DC=lehaneos,DC=lan
     ├── OU=Servers
     ├── OU=Workstations
     └── OU=Groups
-
         ├── OU=Departments
         ├── OU=Shared
         └── OU=Security
