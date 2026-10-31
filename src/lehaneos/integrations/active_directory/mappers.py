@@ -1,5 +1,7 @@
 from ldap3 import Entry
 
+from lehaneos.integrations.active_directory.provisioning.schemas.company import Company
+from lehaneos.integrations.active_directory.provisioning.schemas.organization import OrganizationUnit
 from lehaneos.integrations.active_directory.schemas.ad_group import ADGroup
 from lehaneos.integrations.active_directory.schemas.ad_user import ADUser
 
