@@ -1,23 +1,23 @@
 import subprocess
 import json
 from pathlib import Path
-
+import logging
 from lehaneos.core.logging_config import configure_logging
 from lehaneos.core.exceptions.base import PowershellError
 
-logger = configure_logging()
+logger = logging.getLogger(__name__)
 
 
 class PowerShellRunner:
 
-    def run(self, script: Path, *args):
+    def run(self, script: Path, parameters: dict):
         """
         Execute a PowerShell script and parse
         its JSON response.
 
         Args:
             script: Full path of the PowerShell script.
-            *args: Arguments passed to the script.
+            parameters: Arguments passed to the script.
 
         Returns:
             dict: Parsed JSON response.
@@ -31,16 +31,17 @@ class PowerShellRunner:
 
         logger.info(f"Launching Powershell script")
         logger.info(f"Script: {script}")
-        logger.info(f"Arguments: {args}")
+        logger.info(f"Arguments: {parameters}")
 
+        params_build = self._build_arguments(parameters)
         pwsh_command = subprocess.run(
             [
-                "powershell.exe",
+                "pwsh",
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
                 script,
-                *args
+                *params_build,
             ],
             capture_output=True,
             text=True
@@ -79,3 +80,15 @@ class PowerShellRunner:
 
 
         return response
+
+    def _build_arguments(self, parameters: dict) -> list[str]:
+        build_parameters = []
+        for key, value in parameters.items():
+            build_parameters.append(f"-{key}")
+            if isinstance(value, list):
+                for item in value:
+                    build_parameters.append(item)
+            else:
+                build_parameters.append(value)
+
+        return build_parameters
