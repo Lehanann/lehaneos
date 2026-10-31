@@ -1,0 +1,20 @@
+jobs:
+
+  system_administrator:
+    title: Administrateur systèmes
+    organization_unit: admins
+    groups:
+      - GRP_ADM_LEHANEOS
+      - GRP_DEPT_IT
+
+  support_technician:
+    title: Technicien support
+    organization_unit: users
+    groups:
+      - GRP_DEPT_IT
+
+  payroll_rh:
+    title: Gestionnaire de paie
+    organization_unit: users
+    groups:
+      - GRP_DEPT_RH
