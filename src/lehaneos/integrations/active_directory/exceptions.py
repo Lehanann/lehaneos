@@ -14,3 +14,18 @@ class ActiveDirectoryUserNotFoundError(ActiveDirectoryError):
 
 class ActiveDirectoryGroupNotFoundError(ActiveDirectoryError):
     pass
+
+class ActiveDirectoryUserAlreadyExistsError(ActiveDirectoryError):
+    pass
+
+class ActiveDirectoryJobNotFoundError(ActiveDirectoryError):
+    pass
+
+class ActiveDirectoryDomainNotFoundError(ActiveDirectoryError):
+    pass
+
+class ActiveDirectoryCompanyNotFoundError(ActiveDirectoryError):
+    pass
+
+class ActiveDirectoryOrganizationUnitNotFoundError(ActiveDirectoryError):
+    pass
