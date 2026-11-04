@@ -27,7 +27,7 @@ class UserProvisioningService:
         self.organization_repository = organization_repository
         self.account_identity_builder = account_identity_builder
 
-    def provision(self,first_name:str, last_name:str, job_name: str):
+    def provision(self,first_name:str, last_name:str, job_name: str) -> UserAccountProvisioning:
         try:
             # ======================================================
             # User Identity

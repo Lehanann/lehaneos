@@ -1,6 +1,6 @@
 param(
     [string]$Username,
-    [string]$email,
+    [string]$Email,
     [string]$FirstName,
     [string]$LastName,
     [string]$DisplayName,
@@ -92,3 +92,6 @@ catch {
         }
     } | ConvertTO-Json -depth 5
 }
+
+
+-Username "edurand" -Email "edurand@lehaneos.lan" -FirstName "Elisa" -LastName "Durand" -DisplayName "Elisa Durand" -OrganizationUnitDN "OU=Users,OU=LehanEOS_France,DC=lehaneos,DC=lan" -TemporaryPassword "Password123456!" -UserPrincipalName "edurand@lehaneos.lan" -ProxyAddresses $ProxyAdd -GroupsDN $Groups -Title "Technicienne" -Company "LehanEOS" -StreetAddress "1 rue de la république" -City "Lyon" -Country "FR"

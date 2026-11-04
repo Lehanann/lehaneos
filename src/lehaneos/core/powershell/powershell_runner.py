@@ -2,13 +2,16 @@ import subprocess
 import json
 from pathlib import Path
 import logging
-from lehaneos.core.logging_config import configure_logging
 from lehaneos.core.exceptions.base import PowershellError
 
 logger = logging.getLogger(__name__)
 
 
 class PowerShellRunner:
+
+    def __init__(self, host: str, username: str):
+        self.host = host
+        self.username = username
 
     def run(self, script: Path, parameters: dict):
         """
@@ -33,10 +36,18 @@ class PowerShellRunner:
         logger.info(f"Script: {script}")
         logger.info(f"Arguments: {parameters}")
 
+        print("PARAMETERS BEFORE BUILD:",parameters)
         params_build = self._build_arguments(parameters)
+
+        print("PARAMS_BUILD",params_build)
+
         pwsh_command = subprocess.run(
             [
-                "pwsh",
+                "ssh",
+                "-i",
+                "/home/ygrondin/.ssh/lehaneos_ad",
+                f"{self.username}@{self.host}",
+                "powershell.exe",
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
@@ -53,6 +64,9 @@ class PowerShellRunner:
             logger.error(f"Stderr: {pwsh_command.stderr}")
 
         try:
+            print("RETURN CODE:", pwsh_command.returncode)
+            print("STDOUT:", repr(pwsh_command.stdout))
+            print("STDERR:", repr(pwsh_command.stderr))
             response = json.loads(pwsh_command.stdout)
         except json.JSONDecodeError:
             logger.error(f"Invalid JSON: {pwsh_command.stdout}")
@@ -84,11 +98,10 @@ class PowerShellRunner:
     def _build_arguments(self, parameters: dict) -> list[str]:
         build_parameters = []
         for key, value in parameters.items():
-            build_parameters.append(f"-{key}")
             if isinstance(value, list):
-                for item in value:
-                    build_parameters.append(item)
+                values = ",".join(f'"{item}"' for item in value)
+                build_parameters.append(f'-{key} {values}')
             else:
-                build_parameters.append(value)
+                build_parameters.append(f'-{key} "{value}"')
 
         return build_parameters
