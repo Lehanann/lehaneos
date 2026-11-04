@@ -27,4 +27,14 @@ class Settings(BaseSettings):
     def full_root_ou(self) -> str:
         return f"{self.ad_root_ou},{self.ad_base_dn}"
 
+    # ==================================================================
+    # SSH
+    # ==================================================================
+    ssh_host: str = Field(default="localhost")
+    ssh_port: int = Field(default=22)
+    ssh_username: str = Field(default="")
+    ssh_password: str = Field(default="")
+    ssh_private_key: str = Field(default="")
+    ssh_encoding: str = Field(default="utf-8")
+
 settings = Settings()
