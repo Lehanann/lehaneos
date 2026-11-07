@@ -88,12 +88,13 @@ class SSHManager:
             self._client = None
             raise SSHError() from e
 
-    def execute_command(self, command: str) -> SSHResult:
+    def execute_command(self, command: str, stdin_data: str | None) -> SSHResult:
         """
         Execute a remote command through SSH.
 
         Args:
             command: Command to execute remotely.
+            stdin_data: Command to execute remotely.
 
         Returns:
             SSHResult: Command execution result.
@@ -101,14 +102,23 @@ class SSHManager:
         Raises:
             SSHNotConnectedError: Raised when no SSH connection is available.
         """
+
         if self._client is None:
             raise SSHNotConnectedError()
         try:
-            _, stdout, stderr =  self._client.exec_command(command)
+            stdin, stdout, stderr =  self._client.exec_command(command)
+
+            if stdin_data:
+                stdin.write(stdin_data)
+                stdin.flush()
+                stdin.channel.shutdown_write()
+            stdout_bytes = stdout.read()
+            stderr_bytes = stderr.read()
+            exit_status = stdout.channel.recv_exit_status()
             return SSHResult(
-                stdout=stdout.read().decode(self.encoding),
-                stderr=stderr.read().decode(self.encoding),
-                exit_status=stdout.channel.recv_exit_status()
+                stdout=stdout_bytes.decode(self.encoding),
+                stderr=stderr_bytes.decode(self.encoding),
+                exit_status=exit_status
             )
 
         except UnicodeDecodeError as e:

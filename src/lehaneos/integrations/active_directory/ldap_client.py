@@ -186,10 +186,16 @@ class ActiveDirectoryClient:
             ActiveDirectoryConnectionError:
                 If no connection is established.
         """
+        if self.connection:
+            self.connection.unbind()
+            self.connection = None
+
+
+        """
         if self.connection is None:
             logger.error("Not connected to LDAP Server")
             raise ActiveDirectoryConnectionError("Not connected to LDAP Server")
         self.connection.unbind()
         self.connection = None
         logger.info("Disconnected from LDAP Server")
-
+        """

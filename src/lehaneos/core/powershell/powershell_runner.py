@@ -3,17 +3,18 @@ import json
 from pathlib import Path
 import logging
 from lehaneos.core.exceptions.base import PowershellError
+from lehaneos.core.ssh.ssh_manager import SSHManager
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
 
 class PowerShellRunner:
 
-    def __init__(self, host: str, username: str):
-        self.host = host
-        self.username = username
+    def __init__(self, ssh_client: SSHManager):
+        self.ssh_client = ssh_client
 
-    def run(self, script: Path, parameters: dict):
+    def run(self, script: Path, parameters: BaseModel):
         """
         Execute a PowerShell script and parse
         its JSON response.
@@ -30,12 +31,27 @@ class PowerShellRunner:
             fails or if the returned JSON is invalid.
         """
 
-        script_name= Path(script).stem
+        script_name = Path(script).stem
+        payload = json.dumps(parameters.model_dump())
 
         logger.info(f"Launching Powershell script")
         logger.info(f"Script: {script}")
         logger.info(f"Arguments: {parameters}")
 
+        pwsh_command = self._build_command(script)
+        self.ssh_client.connect()
+        try:
+            result = self.ssh_client.execute_command(command=pwsh_command, stdin_data=payload)
+            print("RESULT STDOUT")
+            print(repr(result.stdout))
+
+            print("RESULT STDERR")
+            print(repr(result.stderr))
+        finally:
+            self.ssh_client.disconnect()
+
+        return json.loads(result.stdout)
+        """    
         print("PARAMETERS BEFORE BUILD:",parameters)
         params_build = self._build_arguments(parameters)
 
@@ -57,19 +73,19 @@ class PowerShellRunner:
             capture_output=True,
             text=True
         )
+   
+        logger.info(f"Return code: {result.exit_status}")
 
-        logger.info(f"Return code: {pwsh_command.returncode}")
-
-        if pwsh_command.stderr:
-            logger.error(f"Stderr: {pwsh_command.stderr}")
+        if result.stderr:
+            logger.error(f"Stderr: {result.stderr}")
 
         try:
-            print("RETURN CODE:", pwsh_command.returncode)
-            print("STDOUT:", repr(pwsh_command.stdout))
-            print("STDERR:", repr(pwsh_command.stderr))
-            response = json.loads(pwsh_command.stdout)
+            print("RETURN CODE:", result.exit_status)
+            print("STDOUT:", repr(result.stdout))
+            print("STDERR:", repr(result.stderr))
+            response = json.loads(result.stdout)
         except json.JSONDecodeError:
-            logger.error(f"Invalid JSON: {pwsh_command.stdout}")
+            logger.error(f"Invalid JSON: {result.stdout}")
             raise PowershellError("Invalid JSON returned by Powershell")
 
         log_message = (f"Module: {script_name} - {response['code']} - {response['message']}")
@@ -91,10 +107,8 @@ class PowerShellRunner:
                 raise PowershellError(
                     "Unknown status returned by Powershell"
         )
-
-
-        return response
-
+        return response   """
+    """
     def _build_arguments(self, parameters: dict) -> list[str]:
         build_parameters = []
         for key, value in parameters.items():
@@ -105,3 +119,12 @@ class PowerShellRunner:
                 build_parameters.append(f'-{key} "{value}"')
 
         return build_parameters
+    """
+    def _build_command(self,script: Path) -> str:
+        command = (
+            f'pwsh.exe '
+            f'-ExecutionPolicy Bypass '
+            f'-File "{script}" '
+        )
+        print(command)
+        return command
