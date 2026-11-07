@@ -1,14 +1,19 @@
 from pathlib import Path
-from lehaneos.integrations.active_directory.provisioning.repositories.yaml_repository import YamlRepository
+
+from lehaneos.integrations.active_directory.provisioning.repositories.yaml_repository import (
+    YamlRepository,
+)
 from lehaneos.integrations.active_directory.provisioning.schemas.job import Job
+
 
 class JobRepository(YamlRepository):
     """
     Repository responsible for accessing job configuration data.
     """
+
     PATH_FILE = Path(__file__).parent.parent / "config" / "job.yaml"
 
-    def get_job(self,job_name: str) -> Job | None:
+    def get_job(self, job_name: str) -> Job | None:
         """
         Retrieve a job definition by its identifier.
 
@@ -31,18 +36,15 @@ class JobRepository(YamlRepository):
 
     def list_jobs(self) -> list[Job]:
         """
-       Retrieve all jobs defined in the job configuration file.
+        Retrieve all jobs defined in the job configuration file.
 
-       Returns:
-           A list containing all configured jobs.
-           Returns an empty list if the configuration loaded.
-       """
+        Returns:
+            A list containing all configured jobs.
+            Returns an empty list if the configuration loaded.
+        """
         data = self._load()
 
         if data is None:
             return []
 
-        return [
-                Job.model_validate(job)
-                for job in data["jobs"].values()
-        ]
+        return [Job.model_validate(job) for job in data["jobs"].values()]

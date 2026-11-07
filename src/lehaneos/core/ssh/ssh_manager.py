@@ -1,12 +1,16 @@
 import paramiko
 from paramiko.ssh_exception import NoValidConnectionsError, PasswordRequiredException
+
 from lehaneos.core.ssh.exceptions import (
-    SSHTimeoutError,
     SSHConnectionError,
+    SSHEncodingError,
     SSHError,
     SSHNotConnectedError,
-    SSHPrivateKeyError, SSHEncodingError)
+    SSHPrivateKeyError,
+    SSHTimeoutError,
+)
 from lehaneos.core.ssh.ssh_result import SSHResult
+
 
 class SSHManager:
     """
@@ -18,14 +22,15 @@ class SSHManager:
 
     It wraps Paramiko and exposes LehanEOS-specific exceptions.
     """
+
     def __init__(
-            self,
-            host: str,
-            username: str,
-            password: str | None = None,
-            key_filename: str | None = None,
-            port: int = 22,
-            encoding: str = "utf-8"
+        self,
+        host: str,
+        username: str,
+        password: str | None = None,
+        key_filename: str | None = None,
+        port: int = 22,
+        encoding: str = "utf-8",
     ) -> None:
         """
         Initialize a new SSH manager.
@@ -70,7 +75,7 @@ class SSHManager:
                 username=self.username,
                 password=self.password,
                 key_filename=self.key_filename,
-                timeout=10
+                timeout=10,
             )
         except TimeoutError as e:
             self._client = None
@@ -121,7 +126,7 @@ class SSHManager:
             return SSHResult(
                 stdout=stdout_bytes.decode(self.encoding),
                 stderr=stderr_bytes.decode(self.encoding),
-                exit_status=exit_status
+                exit_status=exit_status,
             )
 
         except UnicodeDecodeError as e:

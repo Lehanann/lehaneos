@@ -1,41 +1,55 @@
 import logging
+
 from lehaneos.core.security.password_generator import PasswordGenerator
 from lehaneos.integrations.active_directory.exceptions import (
-    ActiveDirectoryUserAlreadyExistsError,
-    ActiveDirectoryJobNotFoundError,
-    ActiveDirectoryOrganizationUnitNotFoundError,
     ActiveDirectoryCompanyNotFoundError,
     ActiveDirectoryGroupNotFoundError,
+    ActiveDirectoryJobNotFoundError,
+    ActiveDirectoryOrganizationUnitNotFoundError,
+    ActiveDirectoryUserAlreadyExistsError,
 )
-from lehaneos.integrations.active_directory.provisioning.builders.account_identity_builder import AccountIdentityBuilder
 from lehaneos.integrations.active_directory.ldap_client import ActiveDirectoryClient
-from lehaneos.integrations.active_directory.provisioning.repositories.job_repository import JobRepository
-from lehaneos.integrations.active_directory.provisioning.repositories.organisation_repository import OrganizationRepository
-from lehaneos.integrations.active_directory.provisioning.schemas.user_account_provisioning import UserAccountProvisioning
+from lehaneos.integrations.active_directory.provisioning.builders.account_identity_builder import (
+    AccountIdentityBuilder,
+)
+from lehaneos.integrations.active_directory.provisioning.repositories.job_repository import (
+    JobRepository,
+)
+from lehaneos.integrations.active_directory.provisioning.repositories.organisation_repository import (
+    OrganizationRepository,
+)
+from lehaneos.integrations.active_directory.provisioning.schemas.user_account_provisioning import (
+    UserAccountProvisioning,
+)
 from lehaneos.settings.settings import settings
 
 logger = logging.getLogger(__name__)
 
-class UserProvisioningService:
 
-    def __init__(self,
-                 active_directory_client: ActiveDirectoryClient,
-                 job_repository: JobRepository,
-                 organization_repository: OrganizationRepository,
-                 account_identity_builder: AccountIdentityBuilder
-                 ) -> None:
+class UserProvisioningService:
+    def __init__(
+        self,
+        active_directory_client: ActiveDirectoryClient,
+        job_repository: JobRepository,
+        organization_repository: OrganizationRepository,
+        account_identity_builder: AccountIdentityBuilder,
+    ) -> None:
         self.active_directory_client = active_directory_client
         self.job_repository = job_repository
         self.organization_repository = organization_repository
         self.account_identity_builder = account_identity_builder
 
-    def provision(self,first_name:str, last_name:str, job_name: str) -> UserAccountProvisioning:
+    def provision(
+        self, first_name: str, last_name: str, job_name: str
+    ) -> UserAccountProvisioning:
         try:
             # ======================================================
             # User Identity
             # ======================================================
             # Build username
-            username = self.account_identity_builder.build_username(first_name,last_name)
+            username = self.account_identity_builder.build_username(
+                first_name, last_name
+            )
             # Check username already exists if exists causes an error
             if self.active_directory_client.user_exists(username):
                 logger.error(
@@ -62,34 +76,42 @@ class UserProvisioningService:
             # Get company and check if is not None
             company = self.organization_repository.get_company()
             if company is None:
-                logger.error(
-                    "Company not found."
-                )
+                logger.error("Company not found.")
                 raise ActiveDirectoryCompanyNotFoundError("Company not found.")
 
             # ======================================================
             # User Account Construction
             # ======================================================
             # Build display name
-            display_name = self.account_identity_builder.build_display_name(first_name, last_name)
+            display_name = self.account_identity_builder.build_display_name(
+                first_name, last_name
+            )
 
             # Build UPN
-            user_principal_name = self.account_identity_builder.build_upn(company.domain, first_name, last_name)
+            user_principal_name = self.account_identity_builder.build_upn(
+                company.domain, first_name, last_name
+            )
 
             # Build user email
-            email = self.account_identity_builder.build_email(company.email_domain, first_name, last_name)
+            email = self.account_identity_builder.build_email(
+                company.email_domain, first_name, last_name
+            )
 
             # ======================================================
             # Active Directory resolution
             # ======================================================
             # Get organization unit assigned to user (groups: users, admins or service accounts)
-            organization_unit = self.organization_repository.get_organization_unit(job.organization_unit)
+            organization_unit = self.organization_repository.get_organization_unit(
+                job.organization_unit
+            )
             if organization_unit is None:
                 logger.error(
                     "Organization unit '%s' not found.",
                     job.organization_unit,
                 )
-                raise ActiveDirectoryOrganizationUnitNotFoundError("Organization unit not found.")
+                raise ActiveDirectoryOrganizationUnitNotFoundError(
+                    "Organization unit not found."
+                )
 
             # Build groups_dn
             groups_dn: list[str] = []

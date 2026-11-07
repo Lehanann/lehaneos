@@ -2,7 +2,6 @@ from lehaneos.settings.settings import settings
 
 
 class AccountMembershipBuilder:
-
     def build_groups_dn(self, groups: list[str]) -> list[str]:
         """
         Build a Distinguished Name(DN) for each group
@@ -29,5 +28,3 @@ class AccountMembershipBuilder:
             built organization unit for a role user.
         """
         return f"OU={role_user},{self.AD_FULL_ROOT}"
-
-

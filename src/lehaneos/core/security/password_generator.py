@@ -1,9 +1,8 @@
-import string
 import secrets
+import string
+
 
 class PasswordGenerator:
-
-
     @staticmethod
     def generate(size=14) -> str:
         """
@@ -24,9 +23,11 @@ class PasswordGenerator:
         uppercase_letters = string.ascii_uppercase
         lowercase_letters = string.ascii_lowercase
         digits = string.digits
-        special_characters = '!#&@/%$'
+        special_characters = "!#&@/%$"
 
-        all_characters = uppercase_letters + lowercase_letters + digits + special_characters
+        all_characters = (
+            uppercase_letters + lowercase_letters + digits + special_characters
+        )
 
         password = [
             secrets.choice(uppercase_letters),
@@ -39,4 +40,4 @@ class PasswordGenerator:
             password.append(secrets.choice(all_characters))
 
         secrets.SystemRandom().shuffle(password)
-        return ''.join(password)
+        return "".join(password)

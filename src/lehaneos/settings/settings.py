@@ -1,5 +1,6 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
@@ -14,15 +15,17 @@ class Settings(BaseSettings):
     ad_base_dn: str = Field(default="DC=DOMAIN,DC=LOCAL")
     ad_root_ou: str = Field(default="")
     ad_users_ou: str = Field(default="OU=Users")
-    ad_groups_ou: str = Field (default="OU=Groups")
+    ad_groups_ou: str = Field(default="OU=Groups")
     ad_port: int = Field(default=389)
 
     @property
     def users_dn(self) -> str:
         return f"{self.ad_users_ou},{self.ad_root_ou},{self.ad_base_dn}"
+
     @property
     def groups_dn(self) -> str:
         return f"{self.ad_groups_ou},{self.ad_root_ou},{self.ad_base_dn}"
+
     @property
     def full_root_ou(self) -> str:
         return f"{self.ad_root_ou},{self.ad_base_dn}"
@@ -36,5 +39,6 @@ class Settings(BaseSettings):
     ssh_password: str = Field(default="")
     ssh_private_key: str = Field(default="")
     ssh_encoding: str = Field(default="utf-8")
+
 
 settings = Settings()

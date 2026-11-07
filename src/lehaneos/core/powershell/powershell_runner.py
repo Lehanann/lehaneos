@@ -1,19 +1,18 @@
 import json
 import logging
 from pathlib import Path
+
 from pydantic import BaseModel, ValidationError
-from lehaneos.core.ssh.ssh_manager import SSHManager
+
 from lehaneos.core.exceptions.base import PowershellError
 from lehaneos.core.powershell.powershell_result import PowerShellResult
 from lehaneos.core.powershell.powershell_status import PowerShellStatus
-
-
+from lehaneos.core.ssh.ssh_manager import SSHManager
 
 logger = logging.getLogger(__name__)
 
 
 class PowerShellRunner:
-
     def __init__(self, ssh_client: SSHManager):
         """
         Initialize a new PowerShell runner.
@@ -50,7 +49,9 @@ class PowerShellRunner:
         pwsh_command = self._build_command(script)
         self.ssh_client.connect()
         try:
-            result = self.ssh_client.execute_command(command=pwsh_command, stdin_data=payload)
+            result = self.ssh_client.execute_command(
+                command=pwsh_command, stdin_data=payload
+            )
         finally:
             self.ssh_client.disconnect()
 
@@ -63,9 +64,7 @@ class PowerShellRunner:
             response = PowerShellResult.model_validate_json(result.stdout)
         except ValidationError as e:
             logger.error("Invalid PowerShell response: %s", result.stdout)
-            raise PowershellError(
-                "Invalid response returned by PowerShell"
-            ) from e
+            raise PowershellError("Invalid response returned by PowerShell") from e
 
         log_message = f"Module: {script_name} - {response.code} - {response.message}"
 
@@ -82,7 +81,7 @@ class PowerShellRunner:
 
         return response
 
-    def _build_command(self,script: Path) -> str:
+    def _build_command(self, script: Path) -> str:
         """
         Build the PowerShell execution command.
 
@@ -92,9 +91,5 @@ class PowerShellRunner:
         Returns:
             str: Complete PowerShell command.
         """
-        command = (
-            f'pwsh.exe '
-            f'-ExecutionPolicy Bypass '
-            f'-File "{script}" '
-        )
+        command = f'pwsh.exe -ExecutionPolicy Bypass -File "{script}" '
         return command

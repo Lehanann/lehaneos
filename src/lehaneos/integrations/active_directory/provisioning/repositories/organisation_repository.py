@@ -1,22 +1,29 @@
 from pathlib import Path
-from lehaneos.integrations.active_directory.provisioning.repositories.yaml_repository import YamlRepository
+
+from lehaneos.integrations.active_directory.provisioning.repositories.yaml_repository import (
+    YamlRepository,
+)
 from lehaneos.integrations.active_directory.provisioning.schemas.company import Company
-from lehaneos.integrations.active_directory.provisioning.schemas.organization import OrganizationUnit
+from lehaneos.integrations.active_directory.provisioning.schemas.organization import (
+    OrganizationUnit,
+)
+
 
 class OrganizationRepository(YamlRepository):
     """
     Repository responsible for accessing organization
     """
+
     PATH_FILE = Path(__file__).parent.parent / "config" / "organization.yaml"
 
     def get_company(self) -> Company | None:
         """
-       Retrieve company information from the organization repository.
+        Retrieve company information from the organization repository.
 
-       Returns:
-           A Company instance containing the organization details,
-           otherwise None if the configuration cannot be loaded.
-       """
+        Returns:
+            A Company instance containing the organization details,
+            otherwise None if the configuration cannot be loaded.
+        """
         data = self._load()
 
         if data is None:
@@ -60,6 +67,6 @@ class OrganizationRepository(YamlRepository):
         if data is None:
             return []
         return [
-                OrganizationUnit.model_validate(unit)
-                for unit in data["organization_units"].values()
+            OrganizationUnit.model_validate(unit)
+            for unit in data["organization_units"].values()
         ]

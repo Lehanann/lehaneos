@@ -1,7 +1,9 @@
 from pydantic import BaseModel, Field
 
+
 class Company(BaseModel):
     """Represents a company"""
+
     name: str = Field(..., description="Company name")
     street: str = Field(..., description="Company street")
     city: str = Field(..., description="Company city")

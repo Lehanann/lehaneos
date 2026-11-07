@@ -1,20 +1,22 @@
 import logging
-from lehaneos.settings.settings import settings
-from ldap3 import Server, Connection, ALL, Entry
+
+from ldap3 import ALL, Connection, Entry, Server
+
 from lehaneos.integrations.active_directory.exceptions import (
     ActiveDirectoryConnectionError,
-    ActiveDirectorySearchError,
     ActiveDirectoryGroupNotFoundError,
-    ActiveDirectoryUserNotFoundError
+    ActiveDirectorySearchError,
+    ActiveDirectoryUserNotFoundError,
 )
-from lehaneos.integrations.active_directory.schemas.ad_user import ADUser
+from lehaneos.integrations.active_directory.mappers import ADGroupMapper, ADUserMapper
 from lehaneos.integrations.active_directory.schemas.ad_group import ADGroup
-from lehaneos.integrations.active_directory.mappers import ADUserMapper, ADGroupMapper
+from lehaneos.integrations.active_directory.schemas.ad_user import ADUser
+from lehaneos.settings.settings import settings
 
 logger = logging.getLogger(__name__)
 
-class ActiveDirectoryClient:
 
+class ActiveDirectoryClient:
     def __init__(self) -> None:
         self.connection: Connection | None = None
         self.server: Server = Server(settings.ad_server, get_info=ALL)
@@ -29,7 +31,11 @@ class ActiveDirectoryClient:
                 If the connection cannot be established.
         """
         if self.connection is None:
-            self.connection = Connection(self.server,user=self.ad_username, password=settings.ad_password.get_secret_value())
+            self.connection = Connection(
+                self.server,
+                user=self.ad_username,
+                password=settings.ad_password.get_secret_value(),
+            )
             if not self.connection.bind():
                 logger.error("Unable to connect to LDAP Server")
                 raise ActiveDirectoryConnectionError("Unable to connect to LDAP Server")
@@ -37,7 +43,9 @@ class ActiveDirectoryClient:
         else:
             logger.info("LDAP Server already connected")
 
-    def search(self,search_base: str, search_filter: str, attributes: list[str] | None = None) -> list[Entry]:
+    def search(
+        self, search_base: str, search_filter: str, attributes: list[str] | None = None
+    ) -> list[Entry]:
         """
         Perform an LDAP search operation.
 
@@ -58,7 +66,9 @@ class ActiveDirectoryClient:
             raise ActiveDirectorySearchError("LDAP Server not established")
         if attributes is None:
             attributes = ["*"]
-        self.connection.search(search_base=search_base, search_filter=search_filter,attributes=attributes)
+        self.connection.search(
+            search_base=search_base, search_filter=search_filter, attributes=attributes
+        )
         return self.connection.entries
 
     def search_user(self, username: str) -> ADUser | None:
@@ -71,7 +81,7 @@ class ActiveDirectoryClient:
         Returns:
             The matching ADUser object if found, otherwise None.
         """
-        entries = self.search(settings.users_dn, f'(sAMAccountName={username})')
+        entries = self.search(settings.users_dn, f"(sAMAccountName={username})")
         if not entries:
             return None
         return ADUserMapper.entry_to_user(entries[0])
@@ -86,7 +96,9 @@ class ActiveDirectoryClient:
         Returns:
             The matching ADGroup object if found otherwise None.
         """
-        entries = self.search(settings.groups_dn, f'(&(objectClass=group)(cn={group_name}))')
+        entries = self.search(
+            settings.groups_dn, f"(&(objectClass=group)(cn={group_name}))"
+        )
         if not entries:
             return None
         return ADGroupMapper.entry_to_group(entries[0])
@@ -189,7 +201,6 @@ class ActiveDirectoryClient:
         if self.connection:
             self.connection.unbind()
             self.connection = None
-
 
         """
         if self.connection is None:

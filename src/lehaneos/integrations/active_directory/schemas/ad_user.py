@@ -1,10 +1,13 @@
-from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
+
+from pydantic import BaseModel, EmailStr, Field
+
 
 class ADUser(BaseModel):
     """
     Represents an Active Directory user.
     """
+
     username: str = Field(..., description="Active directory username")
     email: EmailStr | None = Field(None, description="User email address")
     first_name: str | None = Field(None, description="User first name")
@@ -14,11 +17,17 @@ class ADUser(BaseModel):
     display_name: str | None = Field(None, description="User display name")
     distinguished_name: str = Field(..., description="User distinguished name")
     department: str | None = Field(None, description="User Department")
-    account_expires: datetime | None = Field(None, description="Account expiration date")
+    account_expires: datetime | None = Field(
+        None, description="Account expiration date"
+    )
     user_principal_name: str = Field(..., description="User principal name")
-    proxy_addresses: list[str] = Field(default_factory=list, description="Email addresses list")
+    proxy_addresses: list[str] = Field(
+        default_factory=list, description="Email addresses list"
+    )
     groups: list[str] = Field(default_factory=list, description="Group names list")
-    groups_dn: list[str] = Field(default_factory=list, description="Group distinguished names list")
+    groups_dn: list[str] = Field(
+        default_factory=list, description="Group distinguished names list"
+    )
     description: str | None = Field(None, description="User Description")
     title: str | None = Field(None, description="User title")
     company: str | None = Field(None, description="User company")

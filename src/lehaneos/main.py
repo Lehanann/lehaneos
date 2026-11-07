@@ -1,22 +1,80 @@
+from pathlib import Path
+
 from lehaneos.core.logging_config import configure_logging
+from lehaneos.core.powershell.powershell_runner import PowerShellRunner
+from lehaneos.core.ssh.ssh_manager import SSHManager
 from lehaneos.integrations.active_directory.ldap_client import ActiveDirectoryClient
+from lehaneos.integrations.active_directory.provisioning.builders.account_identity_builder import (
+    AccountIdentityBuilder,
+)
+from lehaneos.integrations.active_directory.provisioning.repositories.job_repository import (
+    JobRepository,
+)
+from lehaneos.integrations.active_directory.provisioning.repositories.organisation_repository import (
+    OrganizationRepository,
+)
+from lehaneos.integrations.active_directory.provisioning.services.user_provisioning_service import (
+    UserProvisioningService,
+)
+from lehaneos.settings.settings import settings
+
+# import paramiko
 
 configure_logging()
 
-ad = ActiveDirectoryClient()
-ad.connect()
-user = ad.search_user("jdupont")
-print("user",user)
-print("####")
-print("GROUP", ad.search_group("GRP_ADM_LEHANEOS"))
-print("####")
-print("jdupont exists:",ad.user_exists("jdupont"))
-print("group GRP_ADM_LEHANEOS exists:",ad.group_exists("GRP_ADM_LEHANEOS"))
-print("###")
-print("USER GROUP", ad.get_user_groups("jdupont") )
-print("###")
-print("MEMBERS OF GRP_LEHANEOS_LDAP \n",ad.get_group_members("GRP_LEHANEOS_LDAP"))
-print("###")
-print(ad.is_member_of("jdupont","GRP_ADM_LEHANEOS"))
+# print(dir(paramiko))
+"""
+ssh_client = SSHManager(
+    host=settings.ssh_host,
+    port=settings.ssh_port,
+    username=settings.ssh_username,
+    key_filename=settings.ssh_private_key,
+    encoding=settings.ssh_encoding,
+)
 
-ad.disconnect()
+ssh_client.connect()
+result = ssh_client.execute_command("Write-output 'Hé t'es quité'")
+ssh_client.disconnect()
+
+print(result.stdout)
+print(result.stderr)
+print(result.exit_status)
+
+ssh_client.disconnect()
+
+
+test = {
+            "Username": "jmoulin",
+            "DisplayName": "Jean Moulin",
+            "ProxyAddresses": ["jmoulin@test.fr","test@test.fr"],
+            "GroupsDN": ["admin","testeur"],
+        }
+"""
+
+ldap_client = ActiveDirectoryClient()
+ldap_client.connect()
+
+pwsh_runner = PowerShellRunner(
+    SSHManager(
+        host=settings.ssh_host,
+        port=settings.ssh_port,
+        username=settings.ssh_username,
+        key_filename=settings.ssh_private_key,
+        encoding=settings.ssh_encoding,
+    )
+)
+
+provision_user = UserProvisioningService(
+    ldap_client,
+    JobRepository(),
+    OrganizationRepository(),
+    AccountIdentityBuilder(),
+)
+
+path_script = Path(r"C:\lehaneos\Scripts\create-user.ps1")
+
+provisioning = provision_user.provision("Milenna", "Luxure", "payroll_rh")
+
+response = pwsh_runner.run(path_script, provisioning)
+print("RETURN", response)
+ldap_client.disconnect()
