@@ -1,3 +1,4 @@
+import logging
 from lehaneos.core.security.password_generator import PasswordGenerator
 from lehaneos.integrations.active_directory.exceptions import (
     ActiveDirectoryUserAlreadyExistsError,
@@ -13,6 +14,7 @@ from lehaneos.integrations.active_directory.provisioning.repositories.organisati
 from lehaneos.integrations.active_directory.provisioning.schemas.user_account_provisioning import UserAccountProvisioning
 from lehaneos.settings.settings import settings
 
+logger = logging.getLogger(__name__)
 
 class UserProvisioningService:
 
@@ -36,6 +38,10 @@ class UserProvisioningService:
             username = self.account_identity_builder.build_username(first_name,last_name)
             # Check username already exists if exists causes an error
             if self.active_directory_client.user_exists(username):
+                logger.error(
+                    "User '%s' already exists in Active Directory.",
+                    username,
+                )
                 raise ActiveDirectoryUserAlreadyExistsError("User already exists.")
 
             # ======================================================
@@ -44,6 +50,10 @@ class UserProvisioningService:
             # Get job and check exists if not found causes an error
             job = self.job_repository.get_job(job_name)
             if job is None:
+                logger.error(
+                    "Job '%s' not found.",
+                    job_name,
+                )
                 raise ActiveDirectoryJobNotFoundError("Job not found.")
 
             # ======================================================
@@ -52,6 +62,9 @@ class UserProvisioningService:
             # Get company and check if is not None
             company = self.organization_repository.get_company()
             if company is None:
+                logger.error(
+                    "Company not found."
+                )
                 raise ActiveDirectoryCompanyNotFoundError("Company not found.")
 
             # ======================================================
@@ -72,6 +85,10 @@ class UserProvisioningService:
             # Get organization unit assigned to user (groups: users, admins or service accounts)
             organization_unit = self.organization_repository.get_organization_unit(job.organization_unit)
             if organization_unit is None:
+                logger.error(
+                    "Organization unit '%s' not found.",
+                    job.organization_unit,
+                )
                 raise ActiveDirectoryOrganizationUnitNotFoundError("Organization unit not found.")
 
             # Build groups_dn
@@ -79,6 +96,10 @@ class UserProvisioningService:
             for group in job.groups:
                 ad_group = self.active_directory_client.search_group(group)
                 if ad_group is None:
+                    logger.error(
+                        "Group '%s' not found.",
+                        group,
+                    )
                     raise ActiveDirectoryGroupNotFoundError("Group not found.")
                 groups_dn.append(ad_group.distinguished_name)
 

@@ -1,9 +1,13 @@
 import json
-from pathlib import Path
 import logging
-from lehaneos.core.exceptions.base import PowershellError
+from pathlib import Path
+from pydantic import BaseModel, ValidationError
 from lehaneos.core.ssh.ssh_manager import SSHManager
-from pydantic import BaseModel
+from lehaneos.core.exceptions.base import PowershellError
+from lehaneos.core.powershell.powershell_result import PowerShellResult
+from lehaneos.core.powershell.powershell_status import PowerShellStatus
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +23,7 @@ class PowerShellRunner:
         """
         self.ssh_client = ssh_client
 
-    def run(self, script: Path, parameters: BaseModel):
+    def run(self, script: Path, parameters: BaseModel) -> PowerShellResult:
         """
         Execute a PowerShell script and parse
         its JSON response.
@@ -29,7 +33,7 @@ class PowerShellRunner:
             parameters: Arguments passed to the script.
 
         Returns:
-            dict: Parsed JSON response.
+            PowerShellResult: Parsed PowerShell response.
 
         Raises:
             PowerShellError: If the script execution
@@ -56,32 +60,27 @@ class PowerShellRunner:
             logger.error("Stderr: %s", result.stderr)
 
         try:
-            response = json.loads(result.stdout)
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON: {result.stdout}")
-            raise PowershellError("Invalid JSON returned by Powershell") from e
+            response = PowerShellResult.model_validate_json(result.stdout)
+        except ValidationError as e:
+            logger.error("Invalid PowerShell response: %s", result.stdout)
+            raise PowershellError(
+                "Invalid response returned by PowerShell"
+            ) from e
 
-        log_message = (f"Module: {script_name} - {response['code']} - {response['message']}")
+        log_message = f"Module: {script_name} - {response.code} - {response.message}"
 
-        match response["status"]:
-            case "success":
+        match response.status:
+            case PowerShellStatus.SUCCESS:
                 logger.info(log_message)
 
-            case "warning":
+            case PowerShellStatus.WARNING:
                 logger.warning(log_message)
 
-            case "error":
+            case PowerShellStatus.ERROR:
                 logger.error(log_message)
-                raise PowershellError(response["message"])
-            case _:
-                logger.error(
-                    f"Unknown status returned: {response}"
-                )
-                raise PowershellError(
-                    "Unknown status returned by Powershell"
-        )
-        return response   
+                raise PowershellError(response.message)
 
+        return response
 
     def _build_command(self,script: Path) -> str:
         """
