@@ -44,7 +44,7 @@ class SSHManager:
         self.key_filename = key_filename
         self.port = port
         self.encoding = encoding
-        self._client = None
+        self._client: paramiko.SSHClient | None = None
 
     def connect(self) -> None:
         """
@@ -88,33 +88,36 @@ class SSHManager:
             self._client = None
             raise SSHError() from e
 
-    def execute_command(self, command: str, stdin_data: str | None) -> SSHResult:
+    def execute_command(self, command: str, stdin_data: str | None = None) -> SSHResult:
         """
         Execute a remote command through SSH.
 
         Args:
             command: Command to execute remotely.
-            stdin_data: Command to execute remotely.
+            stdin_data: Optional data sent to the command standard input.
 
         Returns:
             SSHResult: Command execution result.
 
         Raises:
             SSHNotConnectedError: Raised when no SSH connection is available.
+            SSHEncodingError: Raised when command output cannot be decoded.
         """
-
         if self._client is None:
             raise SSHNotConnectedError()
+
         try:
-            stdin, stdout, stderr =  self._client.exec_command(command)
+            stdin, stdout, stderr = self._client.exec_command(command)
 
             if stdin_data:
                 stdin.write(stdin_data)
                 stdin.flush()
                 stdin.channel.shutdown_write()
+
             stdout_bytes = stdout.read()
             stderr_bytes = stderr.read()
             exit_status = stdout.channel.recv_exit_status()
+
             return SSHResult(
                 stdout=stdout_bytes.decode(self.encoding),
                 stderr=stderr_bytes.decode(self.encoding),
