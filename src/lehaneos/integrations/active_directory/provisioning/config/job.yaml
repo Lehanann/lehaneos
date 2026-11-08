@@ -2,19 +2,324 @@ jobs:
 
   system_administrator:
     title: Administrateur systèmes
-    organization_unit: admins
+    service: information_systems
+    organization_unit: users
     groups:
-      - GRP_ADM_LEHANEOS
-      - GRP_DEPT_IT
+      - GRP_SVC_IT
 
   support_technician:
     title: Technicien support
+    service: information_systems
     organization_unit: users
     groups:
-      - GRP_DEPT_IT
+      - GRP_SVC_IT
 
-  payroll_rh:
-    title: Gestionnaire de paie
+  system_technician:
+    title: Technicien Systèmes et Réseaux
+    service: information_systems
     organization_unit: users
     groups:
-      - GRP_DEPT_RH
+      - GRP_SVC_IT
+
+  it_project_lead:
+    title: Chargé de projet IT
+    service: information_systems
+    organization_unit: users
+    groups:
+      - GRP_SVC_IT
+
+  information_systems_manager:
+    title: Responsable des Systèmes d'Information
+    service: information_systems
+    organization_unit: users
+    groups:
+      - GRP_SVC_IT
+
+  general_director:
+    title: Directeur Général
+    department: direction
+    organization_unit: users
+    groups:
+      - GRP_DEPT_DIRECTION
+
+  payroll_specialist:
+    title: Gestionnaire de paie
+    service: human_resources
+    organization_unit: users
+    groups:
+      - GRP_SVC_RH
+
+  rh_manager:
+    title: Responsable Ressources Humaines
+    service: human_resources
+    organization_unit: users
+    groups:
+      - GRP_SVC_RH
+
+  hr_assistant:
+    title: Assistant Ressources Humaines
+    service: human_resources
+    organization_unit: users
+    groups:
+      - GRP_SVC_RH
+
+  administrative_financial_director:
+    title: Directeur Administratif et Financier
+    department: administration_finance
+    organization_unit: users
+    groups:
+      - GRP_DEPT_ADMINISTRATION_FINANCE
+
+  accounting_manager:
+    title: Responsable Comptabilité
+    service: accounting
+    organization_unit: users
+    groups:
+      - GRP_SVC_COMPTA
+
+  suppliers_accounting_technician:
+    title: Technicien Comptable Fournisseurs
+    service: accounting
+    organization_unit: users
+    groups:
+      - GRP_SVC_COMPTA
+
+  accounting_technician:
+    title: Technicien Comptable
+    service: accounting
+    organization_unit: users
+    groups:
+      - GRP_SVC_COMPTA
+
+  management_controller:
+    title: Contrôleur de Gestion
+    service: management_control
+    organization_unit: users
+    groups:
+      - GRP_SVC_MANAGEMENT_CONTROL
+
+  billing_specialist:
+    title: Chargé de Facturation
+    service: accounting
+    organization_unit: users
+    groups:
+      - GRP_SVC_COMPTA
+
+  accounting_assistant:
+    title: Assistant Comptable
+    service: accounting
+    organization_unit: users
+    groups:
+      - GRP_SVC_COMPTA
+
+  sales_director:
+    title: Directeur Commercial
+    department: sales
+    organization_unit: users
+    groups:
+      - GRP_DEPT_COMMERCIAL
+
+  sales_administration_manager:
+    title: Responsable Administration des Ventes
+    service: sales
+    organization_unit: users
+    groups:
+      - GRP_SVC_COMMERCIAL
+
+  sales_administration_assistant:
+    title: Assistante Administration des Ventes
+    service: sales
+    organization_unit: users
+    groups:
+      - GRP_SVC_COMMERCIAL
+
+  sales_representative:
+    title: Commercial
+    service: sales
+    organization_unit: users
+    groups:
+      - GRP_SVC_COMMERCIAL
+
+  webmarketing_project_lead:
+    title: Chargé de projet Webmarketing
+    service: webmarketing
+    organization_unit: users
+    groups:
+      - GRP_SVC_WEBMARKETING
+
+  after_sales_service_manager:
+    title: Responsable Service Après-vente
+    service: after_sales
+    organization_unit: users
+    groups:
+      - GRP_SVC_SAV
+
+  after_sales_technician:
+    title: Technicien Service Après-vente
+    service: after_sales
+    organization_unit: users
+    groups:
+      - GRP_SVC_SAV
+
+  after_sales_engineer:
+    title: Ingénieur Service Après-vente
+    service: after_sales
+    organization_unit: users
+    groups:
+      - GRP_SVC_SAV
+
+  purchasing_manager:
+    title: Responsable Achats
+    service: purchasing
+    organization_unit: users
+    groups:
+      - GRP_SVC_ACHAT
+
+  purchasing_assistant:
+    title: Assistant Achats
+    service: purchasing
+    organization_unit: users
+    groups:
+      - GRP_SVC_ACHAT
+
+  restocking_agent:
+    title: Ré-approvisionneur
+    service: purchasing
+    organization_unit: users
+    groups:
+      - GRP_SVC_ACHAT
+
+  production_director:
+    title: Directeur de Production
+    department: production
+    organization_unit: users
+    groups:
+      - GRP_DEPT_PRODUCTION
+
+  printing_supervisor:
+    title: Responsable Atelier Impression
+    service: printing
+    organization_unit: users
+    groups:
+      - GRP_SVC_PRINTING
+
+  printing_team_leader:
+    title: Chef d'équipe Impression
+    service: printing
+    organization_unit: users
+    groups:
+      - GRP_SVC_PRINTING
+
+  printing_operator:
+    title: Opérateur Impression
+    service: printing
+    organization_unit: users
+    groups:
+      - GRP_SVC_PRINTING
+
+  sewing_supervisor:
+    title: Responsable Atelier Confection
+    service: sewing
+    organization_unit: users
+    groups:
+      - GRP_SVC_SEWING
+
+  sewing_team_leader:
+    title: Chef d'équipe Confection
+    service: sewing
+    organization_unit: users
+    groups:
+      - GRP_SVC_SEWING
+
+  sewing_operator:
+    title: Opérateur Confection
+    service: sewing
+    organization_unit: users
+    groups:
+      - GRP_SVC_SEWING
+
+  seamstress:
+    title: Couturière
+    service: sewing
+    organization_unit: users
+    groups:
+      - GRP_SVC_SEWING
+
+  shipping_supervisor:
+    title: Responsable expédition
+    service: shipping
+    organization_unit: users
+    groups:
+      - GRP_SVC_SHIPPING
+
+  shipping_operator:
+    title: Agent Expédition
+    service: shipping
+    organization_unit: users
+    groups:
+      - GRP_SVC_SHIPPING
+
+  receiving_supervisor:
+    title: Responsable Réception
+    service: receiving
+    organization_unit: users
+    groups:
+      - GRP_SVC_RECEIVING
+
+  receiving_operator:
+    title: Agent Réception
+    service: receiving
+    organization_unit: users
+    groups:
+      - GRP_SVC_RECEIVING
+
+  production_planning_manager:
+    title: Responsable Lancement
+    service: planning
+    organization_unit: users
+    groups:
+      - GRP_SVC_PLANNING
+
+  planning_technician:
+    title: Technicien planning
+    service: planning
+    organization_unit: users
+    groups:
+      - GRP_SVC_PLANNING
+
+  planning_operator:
+    title: Opérateur Lancement
+    service: planning
+    organization_unit: users
+    groups:
+      - GRP_SVC_PLANNING
+
+  prepress_manager:
+    title: Responsable Prépress
+    service: prepress
+    organization_unit: users
+    groups:
+      - GRP_SVC_PREPRESS
+
+  prepress_technician:
+    title: Technicien Prépress
+    service: prepress
+    organization_unit: users
+    groups:
+      - GRP_SVC_PREPRESS
+
+  prepress_operator:
+    title: Opérateur Prépress
+    service: prepress
+    organization_unit: users
+    groups:
+      - GRP_SVC_PREPRESS
+
+  receptionist:
+    title: Hôtesse d'accueil
+    service: reception
+    organization_unit: users
+    groups:
+      - GRP_SVC_RECEPTION
+
+
