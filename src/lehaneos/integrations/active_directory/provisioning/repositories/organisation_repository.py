@@ -4,6 +4,7 @@ from lehaneos.integrations.active_directory.provisioning.repositories.yaml_repos
     YamlRepository,
 )
 from lehaneos.integrations.active_directory.provisioning.schemas.company import Company
+from lehaneos.integrations.active_directory.provisioning.schemas.department import Department
 from lehaneos.integrations.active_directory.provisioning.schemas.organization import (
     OrganizationUnit,
 )
@@ -30,6 +31,19 @@ class OrganizationRepository(YamlRepository):
             return None
 
         return Company.model_validate(data["company"])
+
+    def get_department(self, department_name: str) -> Department | None:
+
+        data = self._load()
+
+        if data is None:
+            return None
+
+        department = data["departments"].get(department_name)
+        if department is None:
+            return None
+
+        return Department.model_validate(department)
 
     def get_organization_unit(self, name_unit: str) -> OrganizationUnit | None:
         """
@@ -70,3 +84,4 @@ class OrganizationRepository(YamlRepository):
             OrganizationUnit.model_validate(unit)
             for unit in data["organization_units"].values()
         ]
+

@@ -1,63 +1,64 @@
-direction:
-  display_name: Direction
-  department: direction
+services:
+  direction:
+    display_name: Direction
+    department: direction
 
-human_resources:
-  display_name: Ressources Humaines
-  department: direction
+  human_resources:
+    display_name: Ressources Humaines
+    department: direction
 
-information_systems:
-  display_name: Systèmes d'Information
-  department: direction
+  information_systems:
+    display_name: Systèmes d'Information
+    department: direction
 
-purchasing:
-  display_name: Achats
-  department: direction
+  purchasing:
+    display_name: Achats
+    department: direction
 
-accounting:
-  display_name: Comptabilité
-  department: administration_finance
+  accounting:
+    display_name: Comptabilité
+    department: administration_finance
 
-management_control:
-  display_name: Contrôle de Gestion
-  department: administration_finance
+  management_control:
+    display_name: Contrôle de Gestion
+    department: administration_finance
 
-sales:
-  display_name: Commercial
-  department: sales
+  sales:
+    display_name: Commercial
+    department: sales
 
-webmarketing:
-  display_name: Webmarketing
-  department: direction
+  webmarketing:
+    display_name: Webmarketing
+    department: direction
 
-after_sales:
-  display_name: SAV
-  department: direction
+  after_sales:
+    display_name: SAV
+    department: direction
 
-printing:
-  display_name: Impression
-  department: production
+  printing:
+    display_name: Impression
+    department: production
 
-sewing:
-  display_name: Confection
-  department: production
+  sewing:
+    display_name: Confection
+    department: production
 
-shipping:
-  display_name: Expédition
-  department: production
+  shipping:
+    display_name: Expédition
+    department: production
 
-receiving:
-  display_name: Réception
-  department: production
+  receiving:
+    display_name: Réception
+    department: production
 
-planning:
-  display_name: Lancement
-  department: production
+  planning:
+    display_name: Lancement
+    department: production
 
-prepress:
-  display_name: Prépress
-  department: production
+  prepress:
+    display_name: Prépress
+    department: production
 
-reception:
-  display_name: Accueil
-  department: administration_finance
+  reception:
+    display_name: Accueil
+    department: administration_finance

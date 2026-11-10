@@ -39,3 +39,9 @@ class ActiveDirectoryCompanyNotFoundError(ActiveDirectoryError):
 
 class ActiveDirectoryOrganizationUnitNotFoundError(ActiveDirectoryError):
     pass
+
+class ActiveDirectoryServiceNotFoundError(ActiveDirectoryError):
+    pass
+
+class ActiveDirectoryDepartmentNotFoundError(ActiveDirectoryError):
+    pass

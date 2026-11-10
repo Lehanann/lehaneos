@@ -13,6 +13,7 @@ from lehaneos.integrations.active_directory.provisioning.repositories.job_reposi
 from lehaneos.integrations.active_directory.provisioning.repositories.organisation_repository import (
     OrganizationRepository,
 )
+from lehaneos.integrations.active_directory.provisioning.repositories.service_repository import ServiceRepository
 from lehaneos.integrations.active_directory.provisioning.services.user_provisioning_service import (
     UserProvisioningService,
 )
@@ -68,12 +69,15 @@ provision_user = UserProvisioningService(
     ldap_client,
     JobRepository(),
     OrganizationRepository(),
+    ServiceRepository(),
     AccountIdentityBuilder(),
 )
 
 path_script = Path(r"C:\lehaneos\Scripts\create-user.ps1")
 
-provisioning = provision_user.provision("Milenna", "Luxure", "payroll_rh")
+provisioning = provision_user.provision("Jean Philippe", "Delmotte", "general_director")
+#provisioning = provision_user.provision("Mickaël", "Vial", "information_systems_manager")
+
 
 response = pwsh_runner.run(path_script, provisioning)
 print("RETURN", response)

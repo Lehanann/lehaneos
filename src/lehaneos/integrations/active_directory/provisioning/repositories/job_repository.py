@@ -1,10 +1,8 @@
 from pathlib import Path
-
 from lehaneos.integrations.active_directory.provisioning.repositories.yaml_repository import (
     YamlRepository,
 )
 from lehaneos.integrations.active_directory.provisioning.schemas.job import Job
-
 
 class JobRepository(YamlRepository):
     """

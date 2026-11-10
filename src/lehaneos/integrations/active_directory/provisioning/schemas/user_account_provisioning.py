@@ -23,6 +23,8 @@ class UserAccountProvisioning(BaseModel):
         default_factory=list, description="Group distinguished names list"
     )
     title: str = Field(..., description="User title")
+    service_name: str | None = Field(None, description="Service name")
+    department_name: str | None = Field(None, description="Department name")
     company: str = Field(..., description="User company")
     street_address: str = Field(..., description="User street address")
     city: str = Field(..., description="User city")

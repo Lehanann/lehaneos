@@ -7,6 +7,8 @@ from lehaneos.integrations.active_directory.exceptions import (
     ActiveDirectoryJobNotFoundError,
     ActiveDirectoryOrganizationUnitNotFoundError,
     ActiveDirectoryUserAlreadyExistsError,
+    ActiveDirectoryServiceNotFoundError,
+    ActiveDirectoryDepartmentNotFoundError
 )
 from lehaneos.integrations.active_directory.ldap_client import ActiveDirectoryClient
 from lehaneos.integrations.active_directory.provisioning.builders.account_identity_builder import (
@@ -18,6 +20,7 @@ from lehaneos.integrations.active_directory.provisioning.repositories.job_reposi
 from lehaneos.integrations.active_directory.provisioning.repositories.organisation_repository import (
     OrganizationRepository,
 )
+from lehaneos.integrations.active_directory.provisioning.repositories.service_repository import ServiceRepository
 from lehaneos.integrations.active_directory.provisioning.schemas.user_account_provisioning import (
     UserAccountProvisioning,
 )
@@ -32,11 +35,13 @@ class UserProvisioningService:
         active_directory_client: ActiveDirectoryClient,
         job_repository: JobRepository,
         organization_repository: OrganizationRepository,
+        service_repository: ServiceRepository,
         account_identity_builder: AccountIdentityBuilder,
     ) -> None:
         self.active_directory_client = active_directory_client
         self.job_repository = job_repository
         self.organization_repository = organization_repository
+        self.service_repository = service_repository
         self.account_identity_builder = account_identity_builder
 
     def provision(
@@ -69,6 +74,42 @@ class UserProvisioningService:
                     job_name,
                 )
                 raise ActiveDirectoryJobNotFoundError("Job not found.")
+            # ======================================================
+            # Service Information
+            # ======================================================
+            # Get service and check exists if not found causes an error
+
+            service = None
+            if job.service:
+                service = self.service_repository.get_service(job.service)
+                if service is None:
+                    logger.error(
+                        "Service '%s' not found.",
+                        job.service,
+                    )
+                    raise ActiveDirectoryServiceNotFoundError("Service not found.")
+                department = self.organization_repository.get_department(service.department)
+                if department is None:
+                    logger.error(
+                        "Department '%s' not found.",
+                        service.department,
+                    )
+                    raise ActiveDirectoryDepartmentNotFoundError(
+                        "Department not found."
+                    )
+            else:
+                if job.department is None:
+                    logger.error(
+                        "Job '%s' has not department.",
+                        job_name
+                    )
+                    raise ActiveDirectoryJobNotFoundError("Job Department not found.")
+                department = self.organization_repository.get_department(job.department)
+                if department is None:
+                    logger.error(
+                        "Department '%s' not found.",
+                    )
+                    raise ActiveDirectoryOrganizationUnitNotFoundError("Department not found.")
 
             # ======================================================
             # Company Information
@@ -140,6 +181,8 @@ class UserProvisioningService:
                 proxy_addresses=[email],
                 groups_dn=groups_dn,
                 title=job.title,
+                service_name=(service.display_name if service is not None else None),
+                department_name=(department.display_name if department else None),
                 company=company.name,
                 street_address=company.street,
                 city=company.city,

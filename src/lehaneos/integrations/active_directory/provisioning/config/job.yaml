@@ -47,21 +47,21 @@ jobs:
     service: human_resources
     organization_unit: users
     groups:
-      - GRP_SVC_RH
+      - GRP_SVC_HR
 
   rh_manager:
     title: Responsable Ressources Humaines
     service: human_resources
     organization_unit: users
     groups:
-      - GRP_SVC_RH
+      - GRP_SVC_HR
 
   hr_assistant:
     title: Assistant Ressources Humaines
     service: human_resources
     organization_unit: users
     groups:
-      - GRP_SVC_RH
+      - GRP_SVC_HR
 
   administrative_financial_director:
     title: Directeur Administratif et Financier
@@ -75,21 +75,21 @@ jobs:
     service: accounting
     organization_unit: users
     groups:
-      - GRP_SVC_COMPTA
+      - GRP_SVC_ACCOUNTING
 
   suppliers_accounting_technician:
     title: Technicien Comptable Fournisseurs
     service: accounting
     organization_unit: users
     groups:
-      - GRP_SVC_COMPTA
+      - GRP_SVC_ACCOUNTING
 
   accounting_technician:
     title: Technicien Comptable
     service: accounting
     organization_unit: users
     groups:
-      - GRP_SVC_COMPTA
+      - GRP_SVC_ACCOUNTING
 
   management_controller:
     title: Contrôleur de Gestion
@@ -103,14 +103,14 @@ jobs:
     service: accounting
     organization_unit: users
     groups:
-      - GRP_SVC_COMPTA
+      - GRP_SVC_ACCOUNTING
 
   accounting_assistant:
     title: Assistant Comptable
     service: accounting
     organization_unit: users
     groups:
-      - GRP_SVC_COMPTA
+      - GRP_SVC_ACCOUNTING
 
   sales_director:
     title: Directeur Commercial
@@ -173,21 +173,21 @@ jobs:
     service: purchasing
     organization_unit: users
     groups:
-      - GRP_SVC_ACHAT
+      - GRP_SVC_PURCHASING
 
   purchasing_assistant:
     title: Assistant Achats
     service: purchasing
     organization_unit: users
     groups:
-      - GRP_SVC_ACHAT
+      - GRP_SVC_PURCHASING
 
   restocking_agent:
     title: Ré-approvisionneur
     service: purchasing
     organization_unit: users
     groups:
-      - GRP_SVC_ACHAT
+      - GRP_SVC_PURCHASING
 
   production_director:
     title: Directeur de Production
