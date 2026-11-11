@@ -7,9 +7,9 @@ dnspython==2.9.0
 email-validator==2.3.0
 idna==3.20
 iniconfig==2.3.1
+InquirerPy==0.3.4
 invoke==3.0.3
 ldap3==2.9.1
--e git+ssh://git@github.com/Lehanann/lehaneos.git@9cac96126543774ff1341df102aebd7e770eb782#egg=lehaneos
 packaging==26.3
 paramiko==5.1.0
 pluggy==1.7.0
@@ -25,5 +25,7 @@ pytest-cov==7.1.0
 pytest-mock==3.17.0
 python-dotenv==1.2.4
 PyYAML==6.0.3
+ruff==0.17.4
+typer==0.29.0
 typing-inspection==0.4.4
 typing_extensions==4.16.0

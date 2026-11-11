@@ -46,3 +46,14 @@ class JobRepository(YamlRepository):
             return []
 
         return [Job.model_validate(job) for job in data["jobs"].values()]
+
+    def list_jobs_with_key(self) -> dict[str, Job]:
+        data = self._load()
+
+        if data is None:
+            return {}
+
+        return {
+            key: Job.model_validate(job)
+            for key, job in data["jobs"].items()
+        }

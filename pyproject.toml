@@ -6,3 +6,5 @@ authors=[
     { name="Yohan Grondin" }
 ]
 requires-python=">=3.14.4"
+[project.scripts]
+lehaneos = "lehaneos.cli.app:app"
