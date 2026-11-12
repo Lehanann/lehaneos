@@ -1,13 +1,10 @@
-from pathlib import Path
-
 import typer
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 
+from lehaneos.cli.constants import CREATE_USER_SCRIPT, DELETE_USER_SCRIPT, DISABLE_USER_SCRIPT, ENABLE_USER_SCRIPT, RESET_PASSWORD_SCRIPT
+
 from lehaneos.cli.dependencies import build_ldap_client, build_pwsh_runner
-from lehaneos.core.powershell.powershell_runner import PowerShellRunner
-from lehaneos.core.ssh.ssh_manager import SSHManager
-from lehaneos.integrations.active_directory.ldap_client import ActiveDirectoryClient
 from lehaneos.integrations.active_directory.provisioning.builders.account_identity_builder import (
     AccountIdentityBuilder,
 )
@@ -25,15 +22,10 @@ from lehaneos.integrations.active_directory.provisioning.services.user_reset_pas
 from lehaneos.integrations.active_directory.provisioning.services.user_provisioning_service import (
     UserProvisioningService,
 )
-from lehaneos.settings.settings import settings
 
 app = typer.Typer()
 
-CREATE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\create-user.ps1")
-DELETE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\delete-user.ps1")
-DISABLE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\disable-user.ps1")
-ENABLE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\enable-user.ps1")
-RESET_PASSWORD_SCRIPT = Path(r"C:\lehaneos\Scripts\reset-password.ps1")
+
 
 @app.command("create")
 def create_user(
@@ -179,7 +171,6 @@ def reset_password(username: str = typer.Option(
     try:
         reset_password_user = user_reset_password_service.reset_password(username)
         typer.secho(f"✓ New Temporary Password: {reset_password_user.new_password}", fg=typer.colors.BRIGHT_YELLOW, )
-
         response = pwsh_runner.run(RESET_PASSWORD_SCRIPT, reset_password_user)
         typer.secho(f"✓ {response.message}: {response.data['username']}", fg=typer.colors.GREEN, )
     finally:
