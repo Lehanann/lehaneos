@@ -4,6 +4,7 @@ import typer
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 
+from lehaneos.cli.dependencies import build_ldap_client, build_pwsh_runner
 from lehaneos.core.powershell.powershell_runner import PowerShellRunner
 from lehaneos.core.ssh.ssh_manager import SSHManager
 from lehaneos.integrations.active_directory.ldap_client import ActiveDirectoryClient
@@ -56,18 +57,8 @@ def create_user(
     """
     job_identifier = select_job()
 
-    ldap_client = ActiveDirectoryClient()
-    ldap_client.connect()
-
-    pwsh_runner = PowerShellRunner(
-        SSHManager(
-            host=settings.ssh_host,
-            port=settings.ssh_port,
-            username=settings.ssh_username,
-            key_filename=settings.ssh_private_key,
-            encoding=settings.ssh_encoding,
-        )
-    )
+    ldap_client = build_ldap_client()
+    pwsh_runner = build_pwsh_runner()
 
     provision_user = UserProvisioningService(
         ldap_client,
@@ -99,18 +90,8 @@ def delete_user(username: str = typer.Option(
     Returns:
         None.
     """
-    ldap_client = ActiveDirectoryClient()
-    ldap_client.connect()
-
-    pwsh_runner = PowerShellRunner(
-        SSHManager(
-            host=settings.ssh_host,
-            port=settings.ssh_port,
-            username=settings.ssh_username,
-            key_filename=settings.ssh_private_key,
-            encoding=settings.ssh_encoding,
-        )
-    )
+    ldap_client = build_ldap_client()
+    pwsh_runner = build_pwsh_runner()
 
     deletion_service = UserDeletionService(ldap_client)
 
@@ -136,18 +117,8 @@ def disable_user(username: str = typer.Option(
     Returns:
         None.
     """
-    ldap_client = ActiveDirectoryClient()
-    ldap_client.connect()
-
-    pwsh_runner = PowerShellRunner(
-        SSHManager(
-            host=settings.ssh_host,
-            port=settings.ssh_port,
-            username=settings.ssh_username,
-            key_filename=settings.ssh_private_key,
-            encoding=settings.ssh_encoding,
-        )
-    )
+    ldap_client = build_ldap_client()
+    pwsh_runner = build_pwsh_runner()
 
     disable_service = UserDisableService(ldap_client)
 
@@ -173,18 +144,8 @@ def enable_user(username: str = typer.Option(
     Returns:
         None.
     """
-    ldap_client = ActiveDirectoryClient()
-    ldap_client.connect()
-
-    pwsh_runner = PowerShellRunner(
-        SSHManager(
-            host=settings.ssh_host,
-            port=settings.ssh_port,
-            username=settings.ssh_username,
-            key_filename=settings.ssh_private_key,
-            encoding=settings.ssh_encoding,
-        )
-    )
+    ldap_client = build_ldap_client()
+    pwsh_runner = build_pwsh_runner()
 
     enable_service = UserEnableService(ldap_client)
 
@@ -210,18 +171,8 @@ def reset_password(username: str = typer.Option(
     Returns:
         None.
     """
-    ldap_client = ActiveDirectoryClient()
-    ldap_client.connect()
-
-    pwsh_runner = PowerShellRunner(
-        SSHManager(
-            host=settings.ssh_host,
-            port=settings.ssh_port,
-            username=settings.ssh_username,
-            key_filename=settings.ssh_private_key,
-            encoding=settings.ssh_encoding,
-        )
-    )
+    ldap_client = build_ldap_client()
+    pwsh_runner = build_pwsh_runner()
 
     user_reset_password_service = UserResetPasswordService(ldap_client)
 
