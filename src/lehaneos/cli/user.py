@@ -20,7 +20,7 @@ from lehaneos.integrations.active_directory.provisioning.repositories.service_re
 from lehaneos.integrations.active_directory.provisioning.services.user_deletion_service import UserDeletionService
 from lehaneos.integrations.active_directory.provisioning.services.user_disable_service import UserDisableService
 from lehaneos.integrations.active_directory.provisioning.services.user_enable_service import UserEnableService
-
+from lehaneos.integrations.active_directory.provisioning.services.user_reset_password_service import UserResetPasswordService
 from lehaneos.integrations.active_directory.provisioning.services.user_provisioning_service import (
     UserProvisioningService,
 )
@@ -32,6 +32,7 @@ CREATE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\create-user.ps1")
 DELETE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\delete-user.ps1")
 DISABLE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\disable-user.ps1")
 ENABLE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\enable-user.ps1")
+RESET_PASSWORD_SCRIPT = Path(r"C:\lehaneos\Scripts\reset-password.ps1")
 
 @app.command("create")
 def create_user(
@@ -193,6 +194,46 @@ def enable_user(username: str = typer.Option(
         typer.secho(f"✓ {response.message}: {response.data['username']}", fg=typer.colors.GREEN, )
     finally:
         ldap_client.disconnect()
+
+@app.command("reset-password")
+def reset_password(username: str = typer.Option(
+    ...,"--username" , help="User username"
+)) -> None:
+    """
+    Reset password an Active Directory user account.
+
+    The command prompts the operator to enter the username to reset password of the account in Active Directory.
+
+    Args:
+        username: User username.
+
+    Returns:
+        None.
+    """
+    ldap_client = ActiveDirectoryClient()
+    ldap_client.connect()
+
+    pwsh_runner = PowerShellRunner(
+        SSHManager(
+            host=settings.ssh_host,
+            port=settings.ssh_port,
+            username=settings.ssh_username,
+            key_filename=settings.ssh_private_key,
+            encoding=settings.ssh_encoding,
+        )
+    )
+
+    user_reset_password_service = UserResetPasswordService(ldap_client)
+
+    try:
+        reset_password_user = user_reset_password_service.reset_password(username)
+        typer.secho(f"✓ New Temporary Password: {reset_password_user.new_password}", fg=typer.colors.BRIGHT_YELLOW, )
+
+        response = pwsh_runner.run(RESET_PASSWORD_SCRIPT, reset_password_user)
+        typer.secho(f"✓ {response.message}: {response.data['username']}", fg=typer.colors.GREEN, )
+    finally:
+        ldap_client.disconnect()
+
 
 def select_job() -> str:
     """
