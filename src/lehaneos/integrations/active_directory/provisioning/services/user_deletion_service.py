@@ -5,7 +5,7 @@ from lehaneos.integrations.active_directory.exceptions import (
 )
 
 from lehaneos.integrations.active_directory.ldap_client import ActiveDirectoryClient
-from lehaneos.integrations.active_directory.provisioning.schemas.user_deletion import UserDeletion
+from lehaneos.integrations.active_directory.provisioning.schemas.user_identity import UserIdentity
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ class UserDeletionService:
     def __init__(self, active_directory_client: ActiveDirectoryClient) -> None:
         self.active_directory_client = active_directory_client
 
-    def delete(self, username: str) -> UserDeletion:
+    def delete(self, username: str) -> UserIdentity:
         """
         Build user deletion payload.
 
@@ -37,6 +37,6 @@ class UserDeletionService:
             )
             raise ActiveDirectoryUserNotFoundError(f"User not found.")
 
-        return UserDeletion(
+        return UserIdentity(
             username=user.username,
         )

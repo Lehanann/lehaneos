@@ -18,6 +18,9 @@ from lehaneos.integrations.active_directory.provisioning.repositories.organisati
 )
 from lehaneos.integrations.active_directory.provisioning.repositories.service_repository import ServiceRepository
 from lehaneos.integrations.active_directory.provisioning.services.user_deletion_service import UserDeletionService
+from lehaneos.integrations.active_directory.provisioning.services.user_disable_service import UserDisableService
+
+
 from lehaneos.integrations.active_directory.provisioning.services.user_provisioning_service import (
     UserProvisioningService,
 )
@@ -27,6 +30,7 @@ app = typer.Typer()
 
 CREATE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\create-user.ps1")
 DELETE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\delete-user.ps1")
+DISABLE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\disable-user.ps1")
 
 @app.command("create")
 def create_user(
@@ -106,11 +110,48 @@ def delete_user(username: str = typer.Option(
         )
     )
 
-    deletion_user = UserDeletionService(ldap_client)
+    deletion_service = UserDeletionService(ldap_client)
 
     try:
-        deleted = deletion_user.delete(username)
-        response = pwsh_runner.run(DELETE_USER_SCRIPT, deleted)
+        deleted_user = deletion_service.delete(username)
+        response = pwsh_runner.run(DELETE_USER_SCRIPT, deleted_user)
+        typer.secho(f"✓ {response.message}: {response.data['username']}", fg=typer.colors.GREEN, )
+    finally:
+        ldap_client.disconnect()
+
+@app.command("disable")
+def disable_user(username: str = typer.Option(
+    ...,"--username" , help="User username"
+)) -> None:
+    """
+    Disable an Active Directory user account.
+
+    The command prompts the operator to enter the username to disable the account in Active Directory.
+
+    Args:
+        username: User username.
+
+    Returns:
+        None.
+    """
+    ldap_client = ActiveDirectoryClient()
+    ldap_client.connect()
+
+    pwsh_runner = PowerShellRunner(
+        SSHManager(
+            host=settings.ssh_host,
+            port=settings.ssh_port,
+            username=settings.ssh_username,
+            key_filename=settings.ssh_private_key,
+            encoding=settings.ssh_encoding,
+        )
+    )
+
+    disable_service = UserDisableService(ldap_client)
+
+    try:
+        disabled_user = disable_service.disable(username)
+        response = pwsh_runner.run(DISABLE_USER_SCRIPT, disabled_user)
         typer.secho(f"✓ {response.message}: {response.data['username']}", fg=typer.colors.GREEN, )
     finally:
         ldap_client.disconnect()
