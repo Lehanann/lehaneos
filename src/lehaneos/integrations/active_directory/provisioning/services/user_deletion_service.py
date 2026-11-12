@@ -21,7 +21,7 @@ class UserDeletionService:
             username: Active Directory username.
 
         Returns:
-            UserDeletion payload.
+            UserIdentity payload.
         """
 
         # ======================================================

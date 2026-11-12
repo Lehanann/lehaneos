@@ -16,14 +16,14 @@ class UserDisableService:
 
     def disable(self, username: str) -> UserIdentity:
         """
-                Build user deletion payload.
+        Build user disable payload.
 
-                Args:
-                    username: Active Directory username.
+        Args:
+            username: Active Directory username.
 
-                Returns:
-                    UserDeletion payload.
-                """
+        Returns:
+            UserIdentity payload.
+        """
 
         # ======================================================
         # User Identity
