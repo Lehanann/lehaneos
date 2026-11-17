@@ -19,6 +19,10 @@ organization_units:
     display_name: Service Accounts
     ou_name: Service_accounts
 
+  disabled:
+    display_name: Disabled
+    ou_name: Disabled
+
 departments:
   direction:
     display_name: Direction

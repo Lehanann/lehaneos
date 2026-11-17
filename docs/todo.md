@@ -14,3 +14,8 @@ Backlog technique
 - Ajouter un model_validator sur Job
     * service OU department obligatoire
     * service ET department interdits simultanément
+-----------------
+- refactor/iam-domain
+  * introduire UserDeletion
+  * introduire UserLifecycleMove
+  * supprimer UserIdentityLifecycle générique

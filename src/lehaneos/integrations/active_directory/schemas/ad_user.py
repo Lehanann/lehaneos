@@ -21,6 +21,7 @@ class ADUser(BaseModel):
         None, description="Account expiration date"
     )
     user_principal_name: str = Field(..., description="User principal name")
+    user_account_control: int = Field(..., description="User account control")
     proxy_addresses: list[str] = Field(
         default_factory=list, description="Email addresses list"
     )

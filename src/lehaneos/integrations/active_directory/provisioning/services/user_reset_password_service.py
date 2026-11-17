@@ -40,5 +40,6 @@ class UserResetPasswordService:
 
         return UserResetPassword(
             username=user.username,
+            display_name=user.display_name,
             new_password=PasswordGenerator().generate()
         )

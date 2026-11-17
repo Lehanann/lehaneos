@@ -2,7 +2,8 @@ import typer
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 
-from lehaneos.cli.constants import CREATE_USER_SCRIPT, DELETE_USER_SCRIPT, DISABLE_USER_SCRIPT, ENABLE_USER_SCRIPT, RESET_PASSWORD_SCRIPT
+from lehaneos.cli.constants import CREATE_USER_SCRIPT, DELETE_USER_SCRIPT, DISABLE_USER_SCRIPT, ENABLE_USER_SCRIPT, \
+    RESET_PASSWORD_SCRIPT, DISABLED_OU, ENABLED_OU
 
 from lehaneos.cli.dependencies import build_ldap_client, build_pwsh_runner
 from lehaneos.integrations.active_directory.provisioning.builders.account_identity_builder import (
@@ -24,8 +25,6 @@ from lehaneos.integrations.active_directory.provisioning.services.user_provision
 )
 
 app = typer.Typer()
-
-
 
 @app.command("create")
 def create_user(
@@ -88,9 +87,9 @@ def delete_user(username: str = typer.Option(
     deletion_service = UserDeletionService(ldap_client)
 
     try:
-        deleted_user = deletion_service.delete(username)
+        deleted_user = deletion_service.delete(username, DISABLED_OU)
         response = pwsh_runner.run(DELETE_USER_SCRIPT, deleted_user)
-        typer.secho(f"✓ {response.message}: {response.data['username']}", fg=typer.colors.GREEN, )
+        typer.secho(f"✓ {response.message}: {response.data['display_name']}({response.data['username']})", fg=typer.colors.GREEN, )
     finally:
         ldap_client.disconnect()
 
@@ -111,13 +110,13 @@ def disable_user(username: str = typer.Option(
     """
     ldap_client = build_ldap_client()
     pwsh_runner = build_pwsh_runner()
-
-    disable_service = UserDisableService(ldap_client)
+    organization_repo = OrganizationRepository()
+    disable_service = UserDisableService(ldap_client, organization_repo)
 
     try:
-        disabled_user = disable_service.disable(username)
+        disabled_user = disable_service.disable(username,DISABLED_OU)
         response = pwsh_runner.run(DISABLE_USER_SCRIPT, disabled_user)
-        typer.secho(f"✓ {response.message}: {response.data['username']}", fg=typer.colors.GREEN, )
+        typer.secho(f"✓ {response.message}: {response.data['display_name']}({response.data['username']})", fg=typer.colors.GREEN, )
     finally:
         ldap_client.disconnect()
 
@@ -142,7 +141,7 @@ def enable_user(username: str = typer.Option(
     enable_service = UserEnableService(ldap_client)
 
     try:
-        enabled_user = enable_service.enable(username)
+        enabled_user = enable_service.enable(username, ENABLED_OU )
         response = pwsh_runner.run(ENABLE_USER_SCRIPT, enabled_user)
         typer.secho(f"✓ {response.message}: {response.data['username']}", fg=typer.colors.GREEN, )
     finally:

@@ -19,16 +19,16 @@ class Settings(BaseSettings):
     ad_port: int = Field(default=389)
 
     @property
+    def full_root_ou(self) -> str:
+        return f"{self.ad_root_ou},{self.ad_base_dn}"
+
+    @property
     def users_dn(self) -> str:
         return f"{self.ad_users_ou},{self.ad_root_ou},{self.ad_base_dn}"
 
     @property
     def groups_dn(self) -> str:
         return f"{self.ad_groups_ou},{self.ad_root_ou},{self.ad_base_dn}"
-
-    @property
-    def full_root_ou(self) -> str:
-        return f"{self.ad_root_ou},{self.ad_base_dn}"
 
     # ==================================================================
     # SSH

@@ -1,16 +1,16 @@
 import logging
 
 from ldap3 import ALL, Connection, Entry, Server
-
 from lehaneos.integrations.active_directory.exceptions import (
     ActiveDirectoryConnectionError,
     ActiveDirectoryGroupNotFoundError,
     ActiveDirectorySearchError,
     ActiveDirectoryUserNotFoundError,
 )
-from lehaneos.integrations.active_directory.mappers import ADGroupMapper, ADUserMapper
+from lehaneos.integrations.active_directory.mappers import ADGroupMapper, ADUserMapper, ADOrganizationalUnitMapper
 from lehaneos.integrations.active_directory.schemas.ad_group import ADGroup
 from lehaneos.integrations.active_directory.schemas.ad_user import ADUser
+from lehaneos.integrations.active_directory.schemas.ad_organizational_unit import ADOrganizationalUnit
 from lehaneos.settings.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -43,8 +43,14 @@ class ActiveDirectoryClient:
         else:
             logger.info("LDAP Server already connected")
 
+    # =================================================================================
+    # Base Search
+    # =================================================================================
     def search(
-        self, search_base: str, search_filter: str, attributes: list[str] | None = None
+        self,
+        search_base: str,
+        search_filter: str,
+        attributes: list[str] | None = None
     ) -> list[Entry]:
         """
         Perform an LDAP search operation.
@@ -71,6 +77,9 @@ class ActiveDirectoryClient:
         )
         return self.connection.entries
 
+    # =================================================================================
+    # User operations
+    # =================================================================================
     def search_user(self, username: str) -> ADUser | None:
         """
         Search for a user in Active Directory.
@@ -81,27 +90,10 @@ class ActiveDirectoryClient:
         Returns:
             The matching ADUser object if found, otherwise None.
         """
-        entries = self.search(settings.users_dn, f"(sAMAccountName={username})")
+        entries = self.search(settings.full_root_ou, f"(sAMAccountName={username})")
         if not entries:
             return None
         return ADUserMapper.entry_to_user(entries[0])
-
-    def search_group(self, group_name: str) -> ADGroup | None:
-        """
-        Search for a group in Active Directory.
-
-        Args:
-            group_name: Group common name.
-
-        Returns:
-            The matching ADGroup object if found otherwise None.
-        """
-        entries = self.search(
-            settings.groups_dn, f"(&(objectClass=group)(cn={group_name}))"
-        )
-        if not entries:
-            return None
-        return ADGroupMapper.entry_to_group(entries[0])
 
     def user_exists(self, username: str) -> bool:
         """
@@ -114,18 +106,6 @@ class ActiveDirectoryClient:
             True if the user exists, otherwise False.
         """
         return self.search_user(username) is not None
-
-    def group_exists(self, group_name: str) -> bool:
-        """
-        Check whether a group exists.
-
-        Args:
-            group_name: Group common name.
-
-        Returns:
-            True if the group exists, otherwise False.
-        """
-        return self.search_group(group_name) is not None
 
     def get_user_groups(self, username: str) -> list[str]:
         """
@@ -145,6 +125,60 @@ class ActiveDirectoryClient:
         if user is None:
             raise ActiveDirectoryUserNotFoundError(f"User '{username}' not found.")
         return user.groups
+
+    def search_user_ou(self, username: str, ou_name: str ) -> ADUser | None:
+        entries = self.search(
+            f"OU={ou_name},{settings.full_root_ou}",
+            f"(sAMAccountName={username})"
+        )
+        if not entries:
+            return None
+        return ADUserMapper.entry_to_user(entries[0])
+
+    def search_user_disabled(self, username: str) -> ADUser | None:
+        entries = self.search(
+            settings.full_root_ou,
+            f'(&(sAMAccountName={username})(userAccountControl:1.2.840.113556.1.4.803:=2))'
+        )
+        if not entries:
+            return None
+        return ADUserMapper.entry_to_user(entries[0])
+
+    def is_disabled(self, username: str) -> bool:
+
+        return self.search_user_disabled(username) is not None
+
+    # =================================================================================
+    # Group operations
+    # =================================================================================
+    def search_group(self, group_name: str) -> ADGroup | None:
+        """
+        Search for a group in Active Directory.
+
+        Args:
+            group_name: Group common name.
+
+        Returns:
+            The matching ADGroup object if found otherwise None.
+        """
+        entries = self.search(
+            settings.groups_dn, f"(&(objectClass=group)(cn={group_name}))"
+        )
+        if not entries:
+            return None
+        return ADGroupMapper.entry_to_group(entries[0])
+
+    def group_exists(self, group_name: str) -> bool:
+        """
+        Check whether a group exists.
+
+        Args:
+            group_name: Group common name.
+
+        Returns:
+            True if the group exists, otherwise False.
+        """
+        return self.search_group(group_name) is not None
 
     def get_group_members(self, group_name: str) -> list[str]:
         """
@@ -190,6 +224,41 @@ class ActiveDirectoryClient:
             raise ActiveDirectoryGroupNotFoundError(f"Group '{group_name}' not found.")
         return user.distinguished_name in group.members_dn
 
+    # =================================================================================
+    # Organizational unit operations
+    # =================================================================================
+    def search_organization_unit(self,ou_name:str) -> ADOrganizationalUnit | None:
+        """
+        Search for an organizational unit in Active Directory.
+
+        Args:
+            ou_name: Organizational unit name.
+
+        Returns:
+            The matching ADOrganizationalUnit object if found otherwise None.
+        """
+        entries = self.search(
+            settings.full_root_ou,f"(&(objectClass=organizationalUnit)(ou={ou_name}))"
+        )
+        if not entries:
+            return None
+        return ADOrganizationalUnitMapper.entry_to_organizational_unit(entries[0])
+
+    def organizational_unit_exists(self, organization_name: str) -> bool:
+        """
+        Check whether an organizational unit exists.
+
+        Args:
+            organization_name:
+
+        Returns:
+            True if organizational unit exists, otherwise False.
+        """
+        return self.search_organization_unit(organization_name) is not None
+
+    # =================================================================================
+    # Disconnect to ldap
+    # =================================================================================
     def disconnect(self) -> None:
         """
         Disconnect an established connection to the LDAP server.

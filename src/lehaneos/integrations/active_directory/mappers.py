@@ -1,6 +1,7 @@
 from ldap3 import Entry
 
 from lehaneos.integrations.active_directory.schemas.ad_group import ADGroup
+from lehaneos.integrations.active_directory.schemas.ad_organizational_unit import ADOrganizationalUnit
 from lehaneos.integrations.active_directory.schemas.ad_user import ADUser
 
 
@@ -29,6 +30,7 @@ class ADUserMapper:
             department=data.get("department", [None])[0],
             account_expires=data.get("accountExpires", [None])[0],
             user_principal_name=data["userPrincipalName"][0],
+            user_account_control=data["userAccountControl"][0],
             proxy_addresses=data.get("proxyAddresses", []),
             groups_dn=data.get("memberOf", []),
             groups=[
@@ -64,6 +66,26 @@ class ADGroupMapper:
                 dn.split(",")[0].replace("CN=", "") for dn in data.get("member", [])
             ],
             description=data.get("description", [None])[0],
+            created_at=data.get("whenCreated", [None])[0],
+            updated_at=data.get("whenChanged", [None])[0],
+        )
+
+class ADOrganizationalUnitMapper:
+    @staticmethod
+    def entry_to_organizational_unit(entry: Entry) -> ADOrganizationalUnit:
+        """
+        Convert an LDAP entry into an ADOrganizationalUnit object.
+
+        Args:
+            entry: LDAP organizational unit entry returned by ldap3.
+
+        Returns:
+            A populated ADOrganizational unit instance.
+        """
+        data = entry.entry_attributes_as_dict
+        return ADOrganizationalUnit(
+            distinguished_name=data.get("distinguishedName", [None])[0],
+            organizational_unit_name= data.get("ou", [None])[0],
             created_at=data.get("whenCreated", [None])[0],
             updated_at=data.get("whenChanged", [None])[0],
         )
