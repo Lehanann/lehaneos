@@ -1,4 +1,5 @@
 from ldap3 import Entry
+from ldap3.utils.dn import to_dn
 
 from lehaneos.integrations.active_directory.schemas.ad_group import ADGroup
 from lehaneos.integrations.active_directory.schemas.ad_organizational_unit import ADOrganizationalUnit
@@ -27,6 +28,8 @@ class ADUserMapper:
             mobile_phone=data.get("mobile", [None])[0],
             display_name=data.get("displayName", [None])[0],
             distinguished_name=data["distinguishedName"][0],
+            parent_ou_dn=",".join(to_dn(data["distinguishedName"][0])[1:]),
+            is_disabled = bool(data["userAccountControl"][0] & 2),
             department=data.get("department", [None])[0],
             account_expires=data.get("accountExpires", [None])[0],
             user_principal_name=data["userPrincipalName"][0],
@@ -43,7 +46,6 @@ class ADUserMapper:
             city=data.get("l", [None])[0],
             country=data.get("c", [None])[0],
         )
-
 
 class ADGroupMapper:
     @staticmethod

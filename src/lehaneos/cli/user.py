@@ -61,8 +61,16 @@ def create_user(
 
     try:
         provisioning = provision_user.provision(firstname, lastname, job_identifier)
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_BLUE, )
+        typer.secho(f"# Create User Account Active Directory", fg=typer.colors.BRIGHT_BLUE, )
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_BLUE, )
+        typer.secho(f"  User: {provisioning.display_name}({provisioning.username})", fg=typer.colors.BRIGHT_WHITE, )
+        typer.secho(f"  Email: {provisioning.email}", fg=typer.colors.BRIGHT_WHITE, )
+        typer.secho(f"  Temporary Password: {provisioning.temporary_password}", fg=typer.colors.BRIGHT_WHITE, )
+        typer.secho(f"# -----------------------------------------------------", fg=typer.colors.BRIGHT_BLUE, )
         response = pwsh_runner.run(CREATE_USER_SCRIPT, provisioning)
-        typer.secho(f"✓ {response.message}: {response.data['user']}", fg=typer.colors.GREEN,)
+        typer.secho(f"  ✓ {response.message}: {response.data['user']}", fg=typer.colors.BRIGHT_GREEN,)
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_BLUE, )
     finally:
         ldap_client.disconnect()
 
@@ -87,9 +95,13 @@ def delete_user(username: str = typer.Option(
     deletion_service = UserDeletionService(ldap_client)
 
     try:
-        deleted_user = deletion_service.delete(username, DISABLED_OU)
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_RED, )
+        typer.secho(f"# Delete a Disabled User Account Active Directory ", fg=typer.colors.BRIGHT_RED, )
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_RED, )
+        deleted_user = deletion_service.delete(username)
         response = pwsh_runner.run(DELETE_USER_SCRIPT, deleted_user)
-        typer.secho(f"✓ {response.message}: {response.data['display_name']}({response.data['username']})", fg=typer.colors.GREEN, )
+        typer.secho(f"  ✓ {response.message}: {response.data['display_name']}({response.data['username']})", fg=typer.colors.BRIGHT_GREEN, )
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_RED, )
     finally:
         ldap_client.disconnect()
 
@@ -114,9 +126,13 @@ def disable_user(username: str = typer.Option(
     disable_service = UserDisableService(ldap_client, organization_repo)
 
     try:
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_MAGENTA, )
+        typer.secho(f"# Disable User Account Active Directory", fg=typer.colors.BRIGHT_MAGENTA, )
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_MAGENTA, )
         disabled_user = disable_service.disable(username,DISABLED_OU)
         response = pwsh_runner.run(DISABLE_USER_SCRIPT, disabled_user)
-        typer.secho(f"✓ {response.message}: {response.data['display_name']}({response.data['username']})", fg=typer.colors.GREEN, )
+        typer.secho(f"  ✓ {response.message}: {response.data['display_name']}({response.data['username']})", fg=typer.colors.BRIGHT_GREEN, )
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_MAGENTA, )
     finally:
         ldap_client.disconnect()
 
@@ -141,9 +157,13 @@ def enable_user(username: str = typer.Option(
     enable_service = UserEnableService(ldap_client)
 
     try:
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_CYAN, )
+        typer.secho(f"# Ensable User Account Active Directory", fg=typer.colors.BRIGHT_CYAN, )
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_CYAN, )
         enabled_user = enable_service.enable(username, ENABLED_OU )
         response = pwsh_runner.run(ENABLE_USER_SCRIPT, enabled_user)
-        typer.secho(f"✓ {response.message}: {response.data['username']}", fg=typer.colors.GREEN, )
+        typer.secho(f"  ✓ {response.message}: {response.data['username']}", fg=typer.colors.BRIGHT_GREEN, )
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_CYAN, )
     finally:
         ldap_client.disconnect()
 
@@ -168,10 +188,15 @@ def reset_password(username: str = typer.Option(
     user_reset_password_service = UserResetPasswordService(ldap_client)
 
     try:
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_YELLOW, )
+        typer.secho(f"# Reset user password", fg=typer.colors.BRIGHT_YELLOW, )
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_YELLOW, )
         reset_password_user = user_reset_password_service.reset_password(username)
-        typer.secho(f"✓ New Temporary Password: {reset_password_user.new_password}", fg=typer.colors.BRIGHT_YELLOW, )
+        typer.secho(f"  New Temporary Password: {reset_password_user.new_password}", fg=typer.colors.BRIGHT_WHITE, )
         response = pwsh_runner.run(RESET_PASSWORD_SCRIPT, reset_password_user)
-        typer.secho(f"✓ {response.message}: {response.data['username']}", fg=typer.colors.GREEN, )
+        typer.secho(f"# -----------------------------------------------------", fg=typer.colors.BRIGHT_YELLOW, )
+        typer.secho(f"  ✓ {response.message}: {response.data['username']}", fg=typer.colors.GREEN, )
+        typer.secho(f"# =====================================================", fg=typer.colors.BRIGHT_YELLOW, )
     finally:
         ldap_client.disconnect()
 

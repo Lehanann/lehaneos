@@ -16,6 +16,8 @@ class ADUser(BaseModel):
     mobile_phone: str | None = Field(None, description="User Mobile phone")
     display_name: str | None = Field(None, description="User display name")
     distinguished_name: str = Field(..., description="User distinguished name")
+    parent_ou_dn: str = Field(..., description="Parent OU")
+    is_disabled: bool = Field(..., description="Is disabled")
     department: str | None = Field(None, description="User Department")
     account_expires: datetime | None = Field(
         None, description="Account expiration date"

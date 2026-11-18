@@ -6,5 +6,5 @@ DISABLE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\disable-user.ps1")
 ENABLE_USER_SCRIPT = Path(r"C:\lehaneos\Scripts\enable-user.ps1")
 RESET_PASSWORD_SCRIPT = Path(r"C:\lehaneos\Scripts\reset-password.ps1")
 
-DISABLED_OU = "disabled"
-ENABLED_OU = "users"
+DISABLED_OU = "Disabled"
+ENABLED_OU = "Users"

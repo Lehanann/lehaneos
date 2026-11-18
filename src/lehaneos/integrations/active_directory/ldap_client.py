@@ -1,6 +1,7 @@
 import logging
+from typing import Literal
 
-from ldap3 import ALL, Connection, Entry, Server
+from ldap3 import ALL, Connection, Entry, Server, SUBTREE, LEVEL, BASE
 from lehaneos.integrations.active_directory.exceptions import (
     ActiveDirectoryConnectionError,
     ActiveDirectoryGroupNotFoundError,
@@ -15,8 +16,10 @@ from lehaneos.settings.settings import settings
 
 logger = logging.getLogger(__name__)
 
+SearchScopeType = Literal["SUBTREE", "BASE", "LEVEL"]
 
 class ActiveDirectoryClient:
+
     def __init__(self) -> None:
         self.connection: Connection | None = None
         self.server: Server = Server(settings.ad_server, get_info=ALL)
@@ -50,7 +53,8 @@ class ActiveDirectoryClient:
         self,
         search_base: str,
         search_filter: str,
-        attributes: list[str] | None = None
+        attributes: list[str] | None = None,
+        scope: SearchScopeType = SUBTREE
     ) -> list[Entry]:
         """
         Perform an LDAP search operation.
@@ -59,7 +63,7 @@ class ActiveDirectoryClient:
             search_base: Distinguished name used as the search base.
             search_filter: LDAP search filter.
             attributes: Attributes to retrieve. Defaults to all attributes.
-
+            scope:
         Returns:
             A list of LDAP entries matching the search criteria.
 
@@ -73,7 +77,7 @@ class ActiveDirectoryClient:
         if attributes is None:
             attributes = ["*"]
         self.connection.search(
-            search_base=search_base, search_filter=search_filter, attributes=attributes
+            search_base=search_base, search_filter=search_filter, attributes=attributes, search_scope=scope
         )
         return self.connection.entries
 
@@ -125,28 +129,6 @@ class ActiveDirectoryClient:
         if user is None:
             raise ActiveDirectoryUserNotFoundError(f"User '{username}' not found.")
         return user.groups
-
-    def search_user_ou(self, username: str, ou_name: str ) -> ADUser | None:
-        entries = self.search(
-            f"OU={ou_name},{settings.full_root_ou}",
-            f"(sAMAccountName={username})"
-        )
-        if not entries:
-            return None
-        return ADUserMapper.entry_to_user(entries[0])
-
-    def search_user_disabled(self, username: str) -> ADUser | None:
-        entries = self.search(
-            settings.full_root_ou,
-            f'(&(sAMAccountName={username})(userAccountControl:1.2.840.113556.1.4.803:=2))'
-        )
-        if not entries:
-            return None
-        return ADUserMapper.entry_to_user(entries[0])
-
-    def is_disabled(self, username: str) -> bool:
-
-        return self.search_user_disabled(username) is not None
 
     # =================================================================================
     # Group operations
@@ -227,7 +209,7 @@ class ActiveDirectoryClient:
     # =================================================================================
     # Organizational unit operations
     # =================================================================================
-    def search_organization_unit(self,ou_name:str) -> ADOrganizationalUnit | None:
+    def search_organizational_unit(self,ou_name:str) -> ADOrganizationalUnit | None:
         """
         Search for an organizational unit in Active Directory.
 
@@ -254,7 +236,7 @@ class ActiveDirectoryClient:
         Returns:
             True if organizational unit exists, otherwise False.
         """
-        return self.search_organization_unit(organization_name) is not None
+        return self.search_organizational_unit(organization_name) is not None
 
     # =================================================================================
     # Disconnect to ldap
@@ -270,12 +252,3 @@ class ActiveDirectoryClient:
         if self.connection:
             self.connection.unbind()
             self.connection = None
-
-        """
-        if self.connection is None:
-            logger.error("Not connected to LDAP Server")
-            raise ActiveDirectoryConnectionError("Not connected to LDAP Server")
-        self.connection.unbind()
-        self.connection = None
-        logger.info("Disconnected from LDAP Server")
-        """

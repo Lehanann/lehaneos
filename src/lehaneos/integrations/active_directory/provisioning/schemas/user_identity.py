@@ -2,15 +2,24 @@ from pydantic import BaseModel, Field
 
 
 class UserIdentityBase(BaseModel):
-    username: str = Field(..., description="Username of the user to delete")
-    display_name: str | None = Field(None, description="Display name of the user to delete")
+    """
+    Represent a minimal user identity.
+    """
+    username: str = Field(..., description="Active Directory username")
+    display_name: str | None = Field(None, description="Display name of the user")
 
-class UserIdentityLifecycle(UserIdentityBase):
+class UserIdentity(UserIdentityBase):
     """
-    Represent a user identity used by user lifecycle operations.
+    represents  a user identity used with distinguished name.
     """
-    distinguished_name: str = Field(..., description="Distinguished name of the user to delete")
-    target_ou_dn: str = Field(..., description="Target Organization Unit DN")
+    distinguished_name: str = Field(..., description="Distinguished name of the user")
+
+
+class UserMove(UserIdentity):
+    """
+    Represent a user identity used by user lifecycle with enable and disable operations.
+    """
+    target_ou_dn: str = Field(..., description="Target organizational unit distinguished name")
 
 class UserResetPassword(UserIdentityBase):
     """

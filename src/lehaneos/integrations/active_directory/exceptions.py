@@ -45,3 +45,9 @@ class ActiveDirectoryServiceNotFoundError(ActiveDirectoryError):
 
 class ActiveDirectoryDepartmentNotFoundError(ActiveDirectoryError):
     pass
+
+class ActiveDirectoryUserNotDisabledError(ActiveDirectoryError):
+    pass
+
+class ActiveDirectoryUserAlreadyDisabledError(ActiveDirectoryError):
+    pass

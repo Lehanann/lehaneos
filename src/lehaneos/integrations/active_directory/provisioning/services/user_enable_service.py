@@ -2,25 +2,21 @@ import logging
 
 from lehaneos.integrations.active_directory.exceptions import (
     ActiveDirectoryUserNotFoundError,
-    ActiveDirectoryOrganizationUnitNotFoundError,
+    ActiveDirectoryOrganizationUnitNotFoundError, ActiveDirectoryUserNotDisabledError,
 )
 
 from lehaneos.integrations.active_directory.ldap_client import ActiveDirectoryClient
-from lehaneos.integrations.active_directory.provisioning.repositories.organisation_repository import \
-    OrganizationRepository
-from lehaneos.integrations.active_directory.provisioning.schemas.user_identity import UserIdentityLifecycle
-from lehaneos.settings.settings import settings
+from lehaneos.integrations.active_directory.provisioning.schemas.user_identity import UserIdentity, UserMove
 
 logger = logging.getLogger(__name__)
 
 class UserEnableService:
 
-    def __init__(self, active_directory_client: ActiveDirectoryClient, organization_repository: OrganizationRepository):
+    def __init__(self, active_directory_client: ActiveDirectoryClient):
         self.active_directory_client = active_directory_client
-        self.organization_repository = organization_repository
 
 
-    def enable(self, username: str, organization_unit_name: str) -> UserIdentityLifecycle:
+    def enable(self, username: str, organization_unit_name: str) -> UserMove:
         """
         Build user enable payload.
 
@@ -31,17 +27,11 @@ class UserEnableService:
             UserIdentity payload.
         """
         # ======================================================
-        # Organizational unit
+        # User Identity
         # ======================================================
-        # Check organizational unit if not exists causes an error
-        if not self.active_directory_client.organizational_unit_exists(organization_unit_name):
-            logger.error(
-                "Organization unit '%s' does not exist in Active Directory.",
-                organization_unit_name,
-            )
-            raise ActiveDirectoryOrganizationUnitNotFoundError()
-
-        user = self.active_directory_client.search_user_disabled(username)
+        # get username on the active directory
+        user = self.active_directory_client.search_user(username)
+        # Check username if not exists causes an error
         if user is None:
             logger.error(
                 "User '%s' does not exist in OU Disabled.",
@@ -49,25 +39,36 @@ class UserEnableService:
             )
             raise ActiveDirectoryUserNotFoundError(username)
 
-        if not self.active_directory_client.is_disabled(username):
+        if not user.is_disabled:
             logger.error(
                 "User '%s' is not disabled in Active Directory.",
-                username,
+                user.username
             )
-            raise ActiveDirectoryUserNotFoundError(username)
+            raise ActiveDirectoryUserNotDisabledError("user is not disabled in Active Directory.")
 
-        organization_unit = self.organization_repository.get_organization_unit(organization_unit_name)
-        if organization_unit is None:
+        if not "OU=Disabled" in user.parent_ou_dn:
+            logger.error(
+                "User '%s' is not in OU Disabled.",
+            )
+            raise ActiveDirectoryUserNotDisabledError("user is not in OU Disabled.")
+
+        # ======================================================
+        # Organizational unit
+        # ======================================================
+        # Check organizational unit if not exists causes an error
+        organizational_unit = self.active_directory_client.search_organizational_unit(organization_unit_name)
+        # Check organizational unit if not exists causes an error
+        if organizational_unit is None:
             logger.error(
                 "Organization unit '%s' does not exist in the organizational unit toolkit.",
                 organization_unit_name,
             )
-            raise ActiveDirectoryOrganizationUnitNotFoundError(f"Organization unit not found.")
-        new_ou_dn = f"OU={organization_unit.ou_name},{settings.full_root_ou}"
+            raise ActiveDirectoryOrganizationUnitNotFoundError()
 
-        return UserIdentityLifecycle(
+
+        return UserMove(
             username=user.username,
             display_name=user.display_name,
             distinguished_name=user.distinguished_name,
-            target_ou_dn=new_ou_dn
+            target_ou_dn=organizational_unit.distinguished_name,
         )
