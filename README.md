@@ -1,6 +1,7 @@
 # LehanEOS
 
 Infrastructure & Automation Platform
+Identity & Access Management v1.0
 
 ## Présentation
 
@@ -38,12 +39,18 @@ La logique métier doit rester dans Python.
 Version actuelle :
 
 ```text
-V0.1 - Foundations
+V1.0.0 - Identity & Access Management
 ```
 
-Objectif actuel :
+Objectif atteint :
 ```text
-Valider les fondations techniques du projet.
+
+Livraison du premier domaine métier complet de LehanEOS :
+Identity & Access Management (IAM) pour Active Directory.
+
+Le projet permet désormais la gestion du cycle de vie utilisateur :
+création, désactivation, réactivation, suppression contrôlée et
+réinitialisation des mots de passe.
 ```
 Technologies utilisées :
 
@@ -64,11 +71,6 @@ Technologies utilisées :
 
 ## Premier cas d'usage
 
-Commande cible :
-```text
-lehaneos create-user
-```
-
 Fonctionnalités :
 
 - Validation des données
@@ -76,23 +78,73 @@ Fonctionnalités :
 - Génération de l'adresse email
 - Vérification LDAP
 - Création du compte Active Directory
+- Désactivation avec déplacement vers l'OU Disabled
+- Réactivation avec restauration vers l'OU Users
+- Suppression sécurisée des comptes désactivés
+- Réinitialisation de mot de passe
+---
+
+## Active Directory IAM
+### User Lifecycle
+
+- Create user account
+- Disable user account
+- Enable user account
+- Delete disabled user account
+- Reset user password
+
+#### Validations
+
+- LDAP user existence validation
+- LDAP group validation
+- LDAP organizational unit validation
+- Disabled account validation
+- Organizational unit lifecycle validation
+
+Commande disponibles :
+```text
+lehaneos user create
+lehaneos user disable
+lehaneos user enable
+lehaneos user delete
+lehaneos user reset-password
+```
 
 ---
 
 ## Architecture
 ```text
-Utilisateur
+Operator
+↓ 
+CLI (Typer)
 ↓
-CLI
+IAM Domain Services
 ↓
-Python
+LDAP / Repositories
 ↓
-LDAP
-↓
-PowerShell
+PowerShell Runner
 ↓
 Active Directory
 ```
+
+---
+
+## Prochaine étape
+V1.1 - Resource Provisioning
+
+Objectifs :
+
+- SMB Share Provisioning
+- SMB Share Lifecycle Management
+- Security Group Automation
+
+Future domains:
+
+- SIRH
+- SSAP
+- Microsoft 365
+- FastAPI
+- Next.js
 
 ---
 
@@ -123,4 +175,4 @@ docs/roadmap.md
 
 ## Licence
 
-Projet personnel en cours de développement.
+Projet personnel en développement actif.
