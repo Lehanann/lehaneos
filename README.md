@@ -21,6 +21,68 @@ Le projet agit comme une couche d'orchestration entre les différents systèmes.
 
 ---
 
+## Installation
+### Prérequis
+- Python 3.14.4
+- Powershell v7+
+- Active Directory
+- Compte de service disposant des droits nécessaires dans l'annuaire
+
+### Clonage du projet
+```shell
+git clone https://github.com/Lehanann/lehaneos.git
+cd lehaneos
+```
+
+### Création de l'environnement
+```shell
+python -m venv .venv
+```
+Linux:
+```shell
+source .venv/bin/activate
+```
+Windows:
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+### Installation des dépendances
+```shell
+pip install -r requirements.txt
+```
+
+### Configuration
+Copiez le fichier :
+```shell
+cp .env.example .env
+```
+Puis renseignez les paramètres :
+```conf
+AD_SERVER=
+AD_USERNAME=
+AD_PASSWORD=
+```
+
+### Déploiement des scripts Powershell
+Les scripts PowerShell contenus dans :
+
+**scripts/active_directory/**
+
+doivent être déployés sur le serveur d'administration désigné pour l'exécution des opérations Active Directory.
+
+### Vérification
+Lancer la commande :
+```shell
+python -m lehaneos.main user reset-password --username test
+```
+ou
+```shell
+python -m lehaneos.main user create --firstname John --lastname Doe
+```
+
+---
+
 ## Philosophie
 
 LehanEOS repose sur les principes suivants :
@@ -51,8 +113,7 @@ Identity & Access Management (IAM) pour Active Directory.
 Le projet permet désormais la gestion du cycle de vie utilisateur :
 création, désactivation, réactivation, suppression contrôlée et
 réinitialisation des mots de passe.
-```
-Technologies utilisées :
+```Technologies utilisées :
 
 - Python
 - Typer
